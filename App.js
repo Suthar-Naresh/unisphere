@@ -1,11 +1,13 @@
-import { ActivityIndicator, PaperProvider } from "react-native-paper";
-import Router from "./routes/Router";
+import { PaperProvider } from "react-native-paper";
+import { useEffect, useState } from "react";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// Appwrite Context Provider
-import { AppwriteProvider } from "./context/appwriteContext";
-import { useEffect, useState } from "react";
+// context imports
 import auth from "./appwrite/auth"
+import { AppwriteProvider } from "./context/appwriteContext";
+
+// component imports
+import Router from "./routes/Router";
 import Loading from "./components/Loading";
 
 export default function App() {
