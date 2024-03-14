@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import dbService from '../../appwrite/db';
 import bucketService from '../../appwrite/bucket';
+import FabBtn from '../../.zzzzzz/fab'
 
 const HomeTab = () => {
     const { auth, setLoggedIn } = useAppwrite();
@@ -81,6 +82,7 @@ const HomeTab = () => {
                     showsVerticalScrollIndicator={false}
                 />
             </View>
+            {/* <FabBtn/> */}
         </>
     );
 }

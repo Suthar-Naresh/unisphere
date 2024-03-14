@@ -52,12 +52,11 @@ export default function App() {
       <AppwriteProvider value={{ loggedIn, setLoggedIn, auth }}>
         {
           loading ?
-            <Loading/>
+            <Loading />
             :
             <Router />
         }
       </AppwriteProvider>
     </PaperProvider>
-
   );
 }

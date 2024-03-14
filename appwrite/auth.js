@@ -19,7 +19,9 @@ export class AuthService{
             if(userAccount) return this.login({email, password});
             return userAccount;
         } catch (error) {
-            throw new Error("AuthService::createAccount()::error", error);
+            console.log("AuthService::createAccount()::error", error.type);
+            console.log(error);
+            throw new Error(error.message);
         }
     }
 
@@ -27,8 +29,9 @@ export class AuthService{
         try {
             return await this.account.createEmailSession(email,password);
         } catch (error) {
+            console.log("AuthService::login()::error", error.type);
             console.log(error);
-            throw new Error("AuthService::login()::error", error);
+            throw new Error(error.message);
         }
     }
 
@@ -36,7 +39,9 @@ export class AuthService{
         try {
             await this.account.deleteSession('current');
         } catch (error) {
-            throw new Error("AuthService::logout()::error", error);
+            console.log("AuthService::logout()::error", error.type);
+            console.log(error);
+            throw new Error(error.message);
         }
     }
 
@@ -44,7 +49,9 @@ export class AuthService{
         try {
             return await this.account.get();
         } catch (error) {
-            throw new Error("AuthService::getCurrentUser()::error", error);
+            console.log("AuthService::getCurrentUser()::error", error.type);
+            console.log(error);
+            throw new Error(error.message);
         }
     }
 }
