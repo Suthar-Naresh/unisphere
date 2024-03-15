@@ -1,7 +1,7 @@
 import { PaperProvider } from "react-native-paper";
-import Router from "./routes/Router";
 import { AppwriteProvider } from "./context/appwriteAuthContext";
 import { removeSessionDuringDevlopment } from "./utils/devOnly";
+import Router from "./routes/Router";
 
 export default function App() {
   // removeSessionDuringDevlopment();

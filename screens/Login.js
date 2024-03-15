@@ -11,15 +11,15 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { loginSchema } from '../utils/formSchema'
 
 // context imports
-import useAppwrite from '../context/appwriteContext';
+import useAppwrite from '../context/appwriteAuthContext';
 
 // component imports
 import InputBox from '../components/InputBox';
 
 const LoginScreen = ({ navigation }) => {
     const { control, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm({ resolver: zodResolver(loginSchema) });
+    const { auth, setIsLoggedIn, setSessionDetails, setIsLoading } = useAppwrite();
 
-    const { setLoggedIn, auth } = useAppwrite();
     const [hidePassword, setHidePassword] = useState(true);
 
     const handleEye = () => {
@@ -27,17 +27,23 @@ const LoginScreen = ({ navigation }) => {
     }
 
     const handleLogin = async (loginFormData) => {
+        
         try {
             const session = await auth.login({ email: loginFormData.login_email, password: loginFormData.login_password });
-
+            
             if (session) {
+                setIsLoading(true);
+
                 reset({
                     'login_email': '',
                     'login_password': ''
                 });
-                setLoggedIn(true);
-                console.log('session:', session);
+
+                // create user session and set logged-in to true
+                console.log('Login screen --> session:', session);
                 await AsyncStorage.setItem('appwriteSession', JSON.stringify(session.$id));
+                await setSessionDetails();
+                setIsLoggedIn(true);
             }
         } catch (error) {
             Toast.show({
@@ -45,6 +51,8 @@ const LoginScreen = ({ navigation }) => {
                 text1: 'Invalid credentials.'
             });
             console.log(error.message);
+        } finally {
+            setIsLoading(false);
         }
     }
 
@@ -86,7 +94,7 @@ const LoginScreen = ({ navigation }) => {
                             Login
                         </Button>
 
-                        <View className="w-11/12">
+                        <View className="w-11/12 flex flex-row justify-between items-center">
                             <HelperText type='info'>Don't have an account?</HelperText>
                             <HelperText type='info' onPress={() => navigation.navigate('signup')} className='text-violet-500 font-extrabold underline'>Sign Up Now</HelperText>
                         </View>

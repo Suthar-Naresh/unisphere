@@ -3,7 +3,7 @@ import auth from "../appwrite/auth";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Loading from "../components/Loading";
 
-export const INIT_USER = {
+const INIT_USER = {
     id: "",
     name: "",
     email: "",
@@ -18,8 +18,9 @@ const INIT_STATE = {
     isLoggedIn: false,
     auth,
     setUser: () => { },
+    setIsLoading: () => { },
     setIsLoggedIn: () => { },
-    checkStoredSession: async () => { },
+    setSessionDetails: async () => { },
 };
 
 export const AppWriteContext = createContext(INIT_STATE);
@@ -29,7 +30,26 @@ export const AppwriteProvider = ({ children }) => {
     const [isLoading, setIsLoading] = useState(false);
     const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-    // Set user data if any user session exists
+    const setSessionDetails = async () => {
+        const sessionInfo = await auth.getCurrentUser();
+        if (sessionInfo) {
+            console.log('User is already logged in');
+
+            // Set the user context using session info
+            setUser({
+                id: sessionInfo.$id,
+                name: sessionInfo.name,
+                email: sessionInfo.email,
+                university: "Some Uni",
+                labels: sessionInfo.labels,
+                teams: [],
+            });
+
+        } else {
+            console.log('Session expired, require login');
+        }
+    }
+
     const checkStoredSession = async () => {
         setIsLoading(true);
 
@@ -41,26 +61,10 @@ export const AppwriteProvider = ({ children }) => {
             if (sessionDetails) {
                 console.log('Found stored session details:', sessionDetails);
 
-                const sessionInfo = await auth.getCurrentUser();
+                // set the user details in ctx
+                await setSessionDetails();
+                setIsLoggedIn(true);
 
-                if (sessionInfo) {
-                    console.log('User is already logged in');
-
-                    // Set the user context using session info
-                    setUser({
-                        email: sessionInfo.email,
-                        id: sessionInfo.$id,
-                        labels: sessionInfo.labels,
-                        teams: [],
-                        university: "Some Uni",
-                        name: sessionInfo.name,
-                    });
-
-                    setIsLoggedIn(true);
-
-                } else {
-                    console.log('Session expired, require login');
-                }
             } else {
                 console.log('No stored session details found, require login');
             }
@@ -71,14 +75,20 @@ export const AppwriteProvider = ({ children }) => {
         }
     };
 
+    useEffect(() => {
+        console.log('🖐️ effect in context');
+        checkStoredSession();
+    }, []);
+
     const value = {
         user,
-        isLoading,
         isLoggedIn,
         auth,
+        isLoading,
+        setIsLoading,
         setUser,
         setIsLoggedIn,
-        checkStoredSession
+        setSessionDetails
     };
 
     return (

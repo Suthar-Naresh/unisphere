@@ -9,6 +9,6 @@ export const AppWriteContext = createContext({
 
 export const AppwriteProvider = AppWriteContext.Provider;
 
-export default function useAppwrite() {
+export default function useAppwriteOld() {
     return useContext(AppWriteContext)
 }

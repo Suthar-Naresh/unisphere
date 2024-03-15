@@ -8,14 +8,16 @@ import FabBtn from '../../.zzzzzz/fab'
 import useAppwrite from '../../context/appwriteAuthContext';
 
 const HomeTab = () => {
-    const { auth, setIsLoggedIn, user: { name, email } } = useAppwrite();
+    const { auth, setIsLoggedIn, setIsLoading, user: { name, email } } = useAppwrite();
     const [events, setEvents] = useState([]);
 
     useEffect(() => {
+        setIsLoading(true);
         dbService.allEvents().then((res) => {
             const allevnts = res.documents;
             setEvents(allevnts)
-        })
+        });
+        setIsLoading(false);
     }, []);
 
     const handleLogout = () => {

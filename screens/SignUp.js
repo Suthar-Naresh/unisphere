@@ -12,19 +12,17 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { signUpSchema } from '../utils/formSchema';
 
 // context imports
-import useAppwrite from '../context/appwriteContext';
+import useAppwrite from '../context/appwriteAuthContext';
 
 // component imports
-import Loading from '../components/Loading'
 import Dropdown from '../components/DropDownList';
 import InputBox from '../components/InputBox';
 
 function SignUpScreen({ navigation }) {
     const { control, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm({ resolver: zodResolver(signUpSchema) });
+    const { auth, setIsLoggedIn, setIsLoading, setSessionDetails } = useAppwrite();
 
     const [hidePassword, setHidePassword] = useState(true);
-    const [loading, setLoading] = useState(false);
-    const { auth, setLoggedIn } = useAppwrite();
     const [universityList, setUniversityList] = useState([]);
 
     useEffect(() => {
@@ -41,26 +39,27 @@ function SignUpScreen({ navigation }) {
     }
 
     const handleSignUP = async (signUpFormData) => {
-        reset({
-            'signup_name': '',
-            'signup_email': '',
-            'signup_password': '',
-            'signup_retypePassword': '',
-        });
-
+        
         try {
             const session = await auth.createAccount({ name: signUpFormData.signup_name, email: signUpFormData.signup_email, password: signUpFormData.signup_password });
-
+            
             if (session) {
-                setLoading(true);
+                setIsLoading(true);
+                reset({
+                    'signup_name': '',
+                    'signup_email': '',
+                    'signup_password': '',
+                    'signup_retypePassword': '',
+                });
                 // console.log('account created!');
                 try {
+                    // creating student record in the database
                     const student = await dbService.createStudent({ name: signUpFormData.signup_name, email: signUpFormData.signup_email, university: signUpFormData.signup_universityName });
                     if (student) {
-                        setLoading(false);
-                        setLoggedIn(true);
-                        console.log('session:', session);
+                        console.log('Sign-up screen --> session:', session);
                         await AsyncStorage.setItem('appwriteSession', JSON.stringify(session.$id));
+                        await setSessionDetails();
+                        setIsLoggedIn(true);
                     }
 
                 } catch (error) {
@@ -77,11 +76,9 @@ function SignUpScreen({ navigation }) {
                 text1: 'User with email already exists.'
             });
             console.log(error.message);
+        } finally {
+            setIsLoading(false);
         }
-    }
-
-    if (loading) {
-        return <Loading />
     }
 
     return (
@@ -150,7 +147,7 @@ function SignUpScreen({ navigation }) {
                             Sign Up
                         </Button>
 
-                        <View className="w-11/12">
+                        <View className="w-11/12 flex flex-row justify-between items-center">
                             <HelperText type='info'>Already have an account?</HelperText>
                             <HelperText type='info' onPress={() => navigation.navigate('login')} className='text-violet-500 font-extrabold underline'>Login Now</HelperText>
                         </View>
