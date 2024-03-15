@@ -1,20 +1,18 @@
 import { NavigationContainer } from "@react-navigation/native";
-
-// AppwriteContext hook
-import useAppwrite from "../context/appwriteContext";
-
-// Routes
 import AppStack from "./AppStack";
 import AuthStack from "./AuthStack";
 import Toast from "react-native-toast-message";
 
+// context imports
+import useAppwrite from "../context/appwriteAuthContext";
+
 const Router = () => {
-    const { loggedIn } = useAppwrite();
+    const { isLoggedIn } = useAppwrite();
 
     return (
         <>
-            <NavigationContainer >
-                {loggedIn ? <AppStack /> : <AuthStack />}
+            <NavigationContainer>
+                {isLoggedIn ? <AppStack /> : <AuthStack />}
             </NavigationContainer>
             <Toast />
         </>

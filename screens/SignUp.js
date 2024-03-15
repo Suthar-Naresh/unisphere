@@ -164,4 +164,3 @@ function SignUpScreen({ navigation }) {
 }
 
 export default SignUpScreen
-// ICONS :: https://pictogrammers.com/library/mdi/

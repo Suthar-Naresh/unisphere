@@ -1,21 +1,19 @@
 import { Appbar, Button } from 'react-native-paper';
-import useAppwrite from '../../context/appwriteContext';
-import { FlatList, Image, Text, View,StyleSheet } from 'react-native';
+import { FlatList, Image, Text, View, StyleSheet } from 'react-native';
 import { useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import dbService from '../../appwrite/db';
 import bucketService from '../../appwrite/bucket';
 import FabBtn from '../../.zzzzzz/fab'
+import useAppwrite from '../../context/appwriteAuthContext';
 
 const HomeTab = () => {
-    const { auth, setLoggedIn } = useAppwrite();
-    const [user, setUser] = useState('');
+    const { auth, setIsLoggedIn, user: { name, email } } = useAppwrite();
     const [events, setEvents] = useState([]);
 
     useEffect(() => {
         dbService.allEvents().then((res) => {
             const allevnts = res.documents;
-            // console.log(allevnts);
             setEvents(allevnts)
         })
     }, []);
@@ -23,19 +21,15 @@ const HomeTab = () => {
     const handleLogout = () => {
         auth.logout().then(() => {
             AsyncStorage.removeItem('appwriteSession').then(() => {
-                console.log('Session Removed');
-                setLoggedIn(false);
+                console.log('Logged Out');
+                setIsLoggedIn(false);
             })
         });
     }
 
-    auth.getCurrentUser().then((res) => {
-        setUser(res.name);
-    });
-
-    bucketService.getPoster('65d8b5df4209f054fb58').then((res) => {
-        // console.log(res);
-    })
+    // bucketService.getPoster('65d8b5df4209f054fb58').then((res) => {
+    //     console.log(res);
+    // })
 
     const renderItem = ({ item }) => (
         <View className=' flex flex-row p-1 rounded-md shadow-lg mt-5 border'>
@@ -65,9 +59,11 @@ const HomeTab = () => {
                 <Appbar.Content title="UniSphere" />
                 <Appbar.Action icon="account" onPress={handleLogout} />
             </Appbar.Header>
+
             <View className='p-3 flex-1'>
                 <Text className='text-xl font-semibold'>
-                    Welcome {user}!
+                    Welcome {name}!
+                    Teams: {email}
                 </Text>
 
                 <Text className='text-2xl font-semibold mt-8 mb-2'>
@@ -86,11 +82,5 @@ const HomeTab = () => {
         </>
     );
 }
-
-const styles = StyleSheet.create({
-    flatlist: {
-        padding: 16,
-      },
-})
 
 export default HomeTab
