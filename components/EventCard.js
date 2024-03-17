@@ -3,7 +3,7 @@ import { Button, Card, TextInput, Title } from 'react-native-paper'
 import { Text, View } from 'react-native'
 
 
-function EventCard({ title, organizer, price, description, date, time, imageUrl, onPress }) {
+function EventCard({ title, organizer, price, description, date, time, imageUrl, onPress, buttonLabel }) {
     // bucketService.getFilePreview('65f4770561d385014143').then(res => console.log(res)).catch(err => console.log(err.message))
 
     // bucketService.getAllPosters().then(res=>{
@@ -42,7 +42,7 @@ function EventCard({ title, organizer, price, description, date, time, imageUrl,
             </Card.Content>
 
             <Card.Actions>
-                <Button mode='contained' className='rounded-md' onPress={onPress} >Book Now</Button>
+                <Button mode='contained' className='rounded-md' onPress={onPress} >{buttonLabel}</Button>
             </Card.Actions>
 
         </Card>

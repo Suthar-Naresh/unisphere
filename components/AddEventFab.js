@@ -14,7 +14,6 @@ const AddEventFab = ({ children }) => {
         <PaperProvider>
             <Portal>
                 <FAB.Group
-                    className=''
                     open={open}
                     visible
                     icon={open ? 'calendar-today' : 'plus'}
@@ -38,7 +37,7 @@ const AddEventFab = ({ children }) => {
                     }}
                 />
             </Portal>
-                {children}
+            {children}
         </PaperProvider>
     );
 };
