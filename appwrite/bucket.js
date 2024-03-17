@@ -31,7 +31,7 @@ export class BucketService{
 
     async getFilePreview(fileId){
         try {
-            return this.bucket.getFilePreview(conf.appwriteBucketID, fileId);
+            return this.bucket.getFilePreview(conf.bucket_id, fileId);
         } catch (error) {
             throw new Error("BucketService::getFilePreview()::error", error);
         }
@@ -42,6 +42,14 @@ export class BucketService{
             return this.bucket.getFile(conf.bucket_id, fileId);
         } catch (error) {
             throw new Error("BucketService::getPoster()::error", error);
+        }
+    }
+
+    async getAllPosters(){
+        try {
+            return await this.bucket.listFiles(conf.bucket_id);
+        } catch (error) {
+            throw new Error("BucketService::getAllPosters()::error", error);
         }
     }
 }

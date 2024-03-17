@@ -2,14 +2,15 @@ import { createContext, useContext, useEffect, useState } from "react";
 import auth from "../appwrite/auth";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Loading from "../components/Loading";
+import teamService from "../appwrite/team";
+import conf from "../conf/conf";
 
 const INIT_USER = {
     id: "",
     name: "",
     email: "",
     university: "",
-    teams: [],
-    labels: [],
+    isOrganizer: false
 };
 
 const INIT_STATE = {
@@ -32,17 +33,26 @@ export const AppwriteProvider = ({ children }) => {
 
     const setSessionDetails = async () => {
         const sessionInfo = await auth.getCurrentUser();
+
         if (sessionInfo) {
             console.log('User is already logged in');
+
+            // check for user pref for university
+            const { university } = await auth.getUniversity();
+
+            // check if user is part of organization team
+            const teams = await teamService.getTeamsOfUser();
+            const isOrganizer = teams.teams.some(({$id})=>$id===conf.organizers_team_id);
+            // array.some(num => num % 2 === 0)
+            // console.log(teams);
 
             // Set the user context using session info
             setUser({
                 id: sessionInfo.$id,
                 name: sessionInfo.name,
                 email: sessionInfo.email,
-                university: "Some Uni",
-                labels: sessionInfo.labels,
-                teams: [],
+                university: university || 'Man i do\'n go to college',
+                isOrganizer: isOrganizer
             });
 
         } else {

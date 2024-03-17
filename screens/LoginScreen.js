@@ -96,7 +96,7 @@ const LoginScreen = ({ navigation }) => {
 
                         <View className="w-11/12 flex flex-row justify-between items-center">
                             <HelperText type='info'>Don't have an account?</HelperText>
-                            <HelperText type='info' onPress={() => navigation.navigate('signup')} className='text-violet-500 font-extrabold underline'>Sign Up Now</HelperText>
+                            <HelperText type='info' onPress={() => navigation.navigate('signup_screen')} className='text-violet-500 font-extrabold underline'>Sign Up Now</HelperText>
                         </View>
                     </View>
                 </ScrollView>

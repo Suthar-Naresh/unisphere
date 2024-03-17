@@ -54,6 +54,28 @@ export class AuthService{
             throw new Error(error.message);
         }
     }
+
+    async addUniversityName(university){
+        try {
+            return await this.account.updatePrefs({university});
+        } catch (error) {
+            console.log("AuthService::addUniversityName()::error", error.type);
+            console.log(error);
+            throw new Error(error.message);
+        }
+    }
+
+    async getUniversity(){
+        try {
+            return await this.account.getPrefs();
+        } catch (error) {
+            console.log("AuthService::getUniversity()::error", error.type);
+            console.log(error);
+            throw new Error(error.message);
+        }
+    }
+
+
 }
 
 const authService = new AuthService();

@@ -14,7 +14,7 @@ import { signUpSchema } from '../utils/formSchema';
 // context imports
 import useAppwrite from '../context/appwriteAuthContext';
 
-// component imports
+// component imports~
 import Dropdown from '../components/DropDownList';
 import InputBox from '../components/InputBox';
 
@@ -45,18 +45,21 @@ function SignUpScreen({ navigation }) {
             
             if (session) {
                 setIsLoading(true);
-                reset({
-                    'signup_name': '',
-                    'signup_email': '',
-                    'signup_password': '',
-                    'signup_retypePassword': '',
-                });
                 // console.log('account created!');
                 try {
                     // creating student record in the database
                     const student = await dbService.createStudent({ name: signUpFormData.signup_name, email: signUpFormData.signup_email, university: signUpFormData.signup_universityName });
                     if (student) {
                         console.log('Sign-up screen --> session:', session);
+                        await auth.addUniversityName(signUpFormData.signup_universityName);
+
+                        reset({
+                            'signup_name': '',
+                            'signup_email': '',
+                            'signup_password': '',
+                            'signup_retypePassword': '',
+                        });
+
                         await AsyncStorage.setItem('appwriteSession', JSON.stringify(session.$id));
                         await setSessionDetails();
                         setIsLoggedIn(true);
@@ -149,7 +152,7 @@ function SignUpScreen({ navigation }) {
 
                         <View className="w-11/12 flex flex-row justify-between items-center">
                             <HelperText type='info'>Already have an account?</HelperText>
-                            <HelperText type='info' onPress={() => navigation.navigate('login')} className='text-violet-500 font-extrabold underline'>Login Now</HelperText>
+                            <HelperText type='info' onPress={() => navigation.navigate('login_screen')} className='text-violet-500 font-extrabold underline'>Login Now</HelperText>
                         </View>
 
                     </View>

@@ -3,7 +3,7 @@ import { Picker } from '@react-native-picker/picker'
 import { Controller } from 'react-hook-form';
 import { HelperText } from 'react-native-paper';
 
-const MyDropdown = ({ name, control, dropDownList, label, formErrors }) => {
+const DropdownList = ({ name, control, dropDownList, label, formErrors }) => {
   const err = formErrors[name];
   return (
     <Controller
@@ -11,7 +11,7 @@ const MyDropdown = ({ name, control, dropDownList, label, formErrors }) => {
       name={name}
       defaultValue=""
       render={({ field: { onChange, value } }) => (
-        <View className={`w-11/12 px-1 border ${err&&'border-2'} ${err ? 'bg-red-100' : 'bg-violet-100'} ${err?'border-red-700':'border-[#757575]'}  ${err?'focus:border-red-700':'focus:border-[#4527a0]'} focus:border-2 rounded-md`}>
+        <View className={`w-11/12 px-1 border ${err && 'border-2'} ${err ? 'bg-red-100' : 'bg-violet-100'} ${err ? 'border-red-700' : 'border-[#757575]'}  ${err ? 'focus:border-red-700' : 'focus:border-[#4527a0]'} focus:border-2 rounded-md`}>
           <Picker
             selectedValue={value}
             onValueChange={onChange}
@@ -30,4 +30,4 @@ const MyDropdown = ({ name, control, dropDownList, label, formErrors }) => {
   );
 };
 
-export default MyDropdown;
+export default DropdownList;
