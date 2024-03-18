@@ -1,30 +1,16 @@
-import React from 'react'
-import { Text, View } from 'react-native'
+import { Image, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { Drawer } from 'react-native-paper'
 
 function MyEventsTab() {
-    const [active, setActive] = React.useState('');
 
     return (
-        <SafeAreaView>
-
-            <Drawer.Section title="Some title">
-                <Drawer.Item
-                    label="First Item"
-                    active={active === 'first'}
-                    onPress={() => setActive('first')}
-                />
-                <Drawer.Item
-                    style={{ backgroundColor: '#64ffda' }}
-                    icon="star"
-                    label="Second Item"
-                    active={active === 'second'}
-                    onPress={() => setActive('second')}
-                />
-            </Drawer.Section>
-            <View className='bg-emerald-300 h-screen border-emerald-700 border-2'>
-                <Text>My events</Text>
+        <SafeAreaView className='bg-white flex-1'>
+            <View className=' flex-1 py-3 px-2 '>
+                <Text className='text-3xl font-semibold mb-5'>My Events</Text>
+                <View className=' flex-1 my-auto'>
+                    <Image source={require('../../assets/no_events.jpg')} className='w-full h-5/6' />
+                    <Text className=' text-center text-2xl self-center font-medium my-auto text-slate-800'>Nothing in my events </Text>
+                </View>
             </View>
         </SafeAreaView>
     )
