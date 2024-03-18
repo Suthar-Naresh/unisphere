@@ -10,21 +10,31 @@ const NUM_OF_LINES = 3;
 function EventScreen({ navigation, route }) {
 
     const { user: { isOrganizer } } = useAppwrite();
-    const [expanded, setExpanded] = useState(false);
-    const [numberOfLines, setNumberOfLines] = useState(0);
+    const [showMore, setShowMore] = useState(false);
+    const [numberOfLines, setNumberOfLines] = useState(null);
 
-    const handleTextLayout = useCallback((event) => {
+    // const handleTextLayout = useCallback((event) => {
+    //     const { lines } = event.nativeEvent;
+    // console.log('🚪 open?: ', showMore);
+
+    //     setShowMore(lines.length > NUM_OF_LINES);
+    // }, []);
+
+    const handleTextLayout = ((event) => {
         const { lines } = event.nativeEvent;
+        console.log('layout:::line', lines.length);
+        // console.log('🚪 layout:::open?: ', showMore);
+        // setShowMore(lines.length > NUM_OF_LINES);
         setNumberOfLines(lines.length);
-    }, []);
+        // console.log('#lines-->', numberOfLines);
+        // console.log('🚪 layout:::open?: ', showMore);
 
-    const handleToggleExpanded = () => {
-        if (numberOfLines>NUM_OF_LINES) {
-            setExpanded(true);
-        }else{
+    });
 
-            setExpanded(false);
-        }
+    const handleShowMore = () => {
+        // console.log('🚪 open?: ', showMore);
+        setShowMore((pv) => !pv);
+        // console.log('🚪 open?: ', showMore);
     };
 
     // console.log(route.params);
@@ -57,31 +67,45 @@ function EventScreen({ navigation, route }) {
 
 
                 <View>
-                    {expanded && (
-                        <>
+                    {/* {
+                        showMore ? (
                             <ScrollView className='max-h-48 '>
-                                <Text className='my-4 text-justify' >
-                                    Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature, discovered the undoubtable source. Lorem Ipsum comes from sections 1.10.32 and 1.10.33 of "de Finibus Bonorum et Malorum" (The Extremes of Good and Evil) by Cicero, written in 45 BC. This book is a treatise on the theory of ethics, very popular during the Renaissance. The first line of Lorem Ipsum, "Lorem ipsum dolor sit amet..", comes from a line in section 1.10.32.
-                                    The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for those interested. Sections 1.10.32 and 1.10.33 from "de Finibus Bonorum et Malorum" by Cicero are also reproduced in their exact original form, accompanied by English versions from the 1914 translation by H. Rackham.
+                                <Text className=' text-justify' onTextLayout={handleTextLayout}>
                                     {description}
                                 </Text>
                             </ScrollView>
+                        )
+                            : (
+                                <Text numberOfLines={NUM_OF_LINES} style={{ textAlign: 'justify' }}>
+                                    {description}
+                                </Text>
 
-                            <TouchableOpacity onPress={handleToggleExpanded}>
-                                <Text>Show Less</Text>
-                            </TouchableOpacity>
-                        </>
-                    )}
-                    {!expanded && (
-                        <>
-                            <Text onTextLayout={handleTextLayout} numberOfLines={NUM_OF_LINES} style={{ textAlign: 'justify' }}>
+                            )
+                    } */}
+
+                    {showMore ?
+                        <ScrollView className='max-h-48 '>
+                            <Text className=' text-justify bg-green-300' onTextLayout={handleTextLayout}>
                                 {description}
                             </Text>
-                            <TouchableOpacity onPress={handleToggleExpanded}>
-                                <Text>Show More</Text>
+                        </ScrollView>
+                        :
+                        <Text numberOfLines={NUM_OF_LINES} onTextLayout={handleTextLayout} className='text-justify bg-red-300'>
+                            {description}
+                        </Text>
+                    }
+
+                    {numberOfLines > NUM_OF_LINES &&
+                        <>
+                            <TouchableOpacity onPress={handleShowMore}>
+                                <Text className='text-violet-600'>
+                                    {showMore ? 'Show less' : 'Show more'}
+                                </Text>
                             </TouchableOpacity>
                         </>
-                    )}
+
+                    }
+
                 </View>
 
 
