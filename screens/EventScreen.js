@@ -21,23 +21,14 @@ function EventScreen({ navigation, route }) {
     // }, []);
 
     const handleTextLayout = ((event) => {
-        const { lines } = event.nativeEvent;
-        console.log('layout:::line', lines.length);
-        // console.log('🚪 layout:::open?: ', showMore);
-        // setShowMore(lines.length > NUM_OF_LINES);
+        const { lines } = event.nativeEvent; 
         setNumberOfLines(lines.length);
-        // console.log('#lines-->', numberOfLines);
-        // console.log('🚪 layout:::open?: ', showMore);
-
     });
 
     const handleShowMore = () => {
-        // console.log('🚪 open?: ', showMore);
         setShowMore((pv) => !pv);
-        // console.log('🚪 open?: ', showMore);
     };
 
-    // console.log(route.params);
     const { cardDetails: { name, poster, price, organizer, description } } = route.params;
 
     return (
@@ -67,47 +58,28 @@ function EventScreen({ navigation, route }) {
 
 
                 <View>
-                    {/* {
-                        showMore ? (
-                            <ScrollView className='max-h-48 '>
-                                <Text className=' text-justify' onTextLayout={handleTextLayout}>
-                                    {description}
-                                </Text>
-                            </ScrollView>
-                        )
-                            : (
-                                <Text numberOfLines={NUM_OF_LINES} style={{ textAlign: 'justify' }}>
-                                    {description}
-                                </Text>
-
-                            )
-                    } */}
 
                     {showMore ?
                         <ScrollView className='max-h-48 '>
-                            <Text className=' text-justify bg-green-300' onTextLayout={handleTextLayout}>
+                            <Text className=' text-justify' onTextLayout={handleTextLayout}>
                                 {description}
                             </Text>
                         </ScrollView>
                         :
-                        <Text numberOfLines={NUM_OF_LINES} onTextLayout={handleTextLayout} className='text-justify bg-red-300'>
+                        <Text numberOfLines={NUM_OF_LINES} onTextLayout={handleTextLayout} className='text-justify'>
                             {description}
                         </Text>
                     }
 
                     {numberOfLines > NUM_OF_LINES &&
-                        <>
-                            <TouchableOpacity onPress={handleShowMore}>
-                                <Text className='text-violet-600'>
-                                    {showMore ? 'Show less' : 'Show more'}
-                                </Text>
-                            </TouchableOpacity>
-                        </>
-
+                        <TouchableOpacity onPress={handleShowMore}>
+                            <Text className='text-violet-600'>
+                                {showMore ? 'Show less' : 'Show more'}
+                            </Text>
+                        </TouchableOpacity>
                     }
 
                 </View>
-
 
 
                 <View className='my-4 flex flex-row justify-between items-center'>
