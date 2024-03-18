@@ -4,6 +4,7 @@ import { Button, Divider, Appbar, TextInput, Icon } from 'react-native-paper'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import useAppwrite from '../context/appwriteAuthContext'
 import { ScrollView } from 'react-native'
+import Toast from 'react-native-toast-message'
 
 const NUM_OF_LINES = 3;
 
@@ -21,13 +22,20 @@ function EventScreen({ navigation, route }) {
     // }, []);
 
     const handleTextLayout = ((event) => {
-        const { lines } = event.nativeEvent; 
+        const { lines } = event.nativeEvent;
         setNumberOfLines(lines.length);
     });
 
     const handleShowMore = () => {
         setShowMore((pv) => !pv);
     };
+
+    const handleRegisterToEvent = () => {
+        Toast.show({
+            type: 'success',
+            text1: 'Registered successfully!'
+        });
+    }
 
     const { cardDetails: { name, poster, price, organizer, description } } = route.params;
 
@@ -112,7 +120,7 @@ function EventScreen({ navigation, route }) {
                             <Button
                                 mode='contained'
                                 className='absolute bottom-0 w-full rounded-md'
-                                onPress={() => console.log('PAYMENT LOGIC HERE...')}
+                                onPress={handleRegisterToEvent}
                             >
                                 {price === 0 ? 'Register For Free' : 'Book Tickets Now'}
                             </Button>

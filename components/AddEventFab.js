@@ -26,7 +26,7 @@ const AddEventFab = ({ children }) => {
                         {
                             icon: 'bullhorn-variant',
                             label: 'Announce',
-                            onPress: () => console.log('Pressed email'),
+                            onPress: () => navigation.navigate('add_anoucement_screen'),
                         },
                     ]}
                     onStateChange={onStateChange}
