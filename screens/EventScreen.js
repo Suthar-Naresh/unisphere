@@ -1,10 +1,14 @@
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { Text, View, Image, TouchableOpacity } from 'react-native'
-import { Button, Divider, Appbar, TextInput, Icon } from 'react-native-paper'
+import { Button, Divider, Appbar, TextInput, Icon, ActivityIndicator } from 'react-native-paper'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import useAppwrite from '../context/appwriteAuthContext'
 import { ScrollView } from 'react-native'
 import Toast from 'react-native-toast-message'
+import PaymentButton from '../components/PaymentButton'
+import functionService from '../appwrite/functions'
+import { useStripe } from '@stripe/stripe-react-native'
+import Loading from '../components/Loading'
 
 const NUM_OF_LINES = 3;
 
@@ -13,31 +17,54 @@ function EventScreen({ navigation, route }) {
     const { user: { isOrganizer } } = useAppwrite();
     const [showMore, setShowMore] = useState(false);
     const [numberOfLines, setNumberOfLines] = useState(null);
+    const [freeEvent, setFreeEvent] = useState(true);
+    const { initPaymentSheet, presentPaymentSheet } = useStripe();
+    const [loadingPayment, setLoadingPayment] = useState(false);
 
-    // const handleTextLayout = useCallback((event) => {
-    //     const { lines } = event.nativeEvent;
-    // console.log('🚪 open?: ', showMore);
+    const { cardDetails: { name, poster, price, organizer, description } } = route.params;
 
-    //     setShowMore(lines.length > NUM_OF_LINES);
-    // }, []);
+    useEffect(() => { setFreeEvent(price === 0); }, []);
 
-    const handleTextLayout = ((event) => {
+    const handleTextLayout = useCallback((event) => {
         const { lines } = event.nativeEvent;
         setNumberOfLines(lines.length);
-    });
+    }, []);
 
     const handleShowMore = () => {
         setShowMore((pv) => !pv);
     };
 
-    const handleRegisterToEvent = () => {
+    const handlePayEvent = async () => {
+        setLoadingPayment(true);
+
+        const res = await functionService.createPaymentIntent(price);
+        console.log(typeof res);
+        console.log(res);
+        if (!res) console.log('something went wrong!!!!');
+
+        // initialize payment sheet
+        const initResponse = await initPaymentSheet({
+            merchantDisplayName: 'UniSphere',
+            defaultBillingDetails: { address: { country: 'IN' } },
+            paymentIntentClientSecret: JSON.parse(res).paymentIntent,
+        });
+
+        if (initResponse.error) console.log('error.....');
+
+        // present payment sheet from stripe
+        const paymentResponse = await presentPaymentSheet();
+        if (paymentResponse.error) console.log('Pressed close payment sheet.', paymentResponse.error.code);
+
+        setLoadingPayment(false);
+    }
+
+    const handleFreeEvent = async () => {
         Toast.show({
             type: 'success',
             text1: 'Registered successfully!'
         });
     }
 
-    const { cardDetails: { name, poster, price, organizer, description } } = route.params;
 
     return (
         <SafeAreaView className='bg-white flex-1'>
@@ -113,19 +140,11 @@ function EventScreen({ navigation, route }) {
                 </View>
 
                 {
-                    !isOrganizer &&
-
-                    <View className=' flex-1'>
-                        <View className=' flex-1'>
-                            <Button
-                                mode='contained'
-                                className='absolute bottom-0 w-full rounded-md'
-                                onPress={handleRegisterToEvent}
-                            >
-                                {price === 0 ? 'Register For Free' : 'Book Tickets Now'}
-                            </Button>
-                        </View>
-                    </View>
+                    !isOrganizer && (
+                        loadingPayment
+                            ? <ActivityIndicator className='flex-1' />
+                            : <PaymentButton onPress={freeEvent ? handleFreeEvent : handlePayEvent} free={freeEvent} />
+                    )
                 }
             </View>
         </SafeAreaView>
