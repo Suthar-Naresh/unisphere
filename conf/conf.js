@@ -7,6 +7,7 @@ const conf = {
     db_id: String(process.env.EXPO_PUBLIC_APPWRITE_DB_ID),
     bucket_id: String(process.env.EXPO_PUBLIC_APPWRITE_BUCKET_ID),
     organizers_team_id: String(process.env.EXPO_PUBLIC_APPWRITE_ORGANIZERS_TEAM_ID),
+    function_id: String(process.env.EXPO_PUBLIC_APPWRITE_FUNCTION_ID),
 }
 
 export default conf;
