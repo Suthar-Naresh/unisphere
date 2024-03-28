@@ -5,25 +5,35 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import useAppwrite from '../context/appwriteAuthContext'
 import { ScrollView } from 'react-native'
 import Toast from 'react-native-toast-message'
-import PaymentButton from '../components/PaymentButton'
+import PaymentButton, { AlreadyRegisteredButton } from '../components/PaymentButton'
 import functionService from '../appwrite/functions'
 import { useStripe } from '@stripe/stripe-react-native'
 import Loading from '../components/Loading'
+import dbService from '../appwrite/db'
+import useRegisteredEvents from '../context/registeredEventsContext'
 
 const NUM_OF_LINES = 3;
 
 function EventScreen({ navigation, route }) {
 
-    const { user: { isOrganizer } } = useAppwrite();
+    const { auth, user: { isOrganizer, id } } = useAppwrite();
+    const { events, setRegisteredEvents } = useRegisteredEvents();
+
     const [showMore, setShowMore] = useState(false);
     const [numberOfLines, setNumberOfLines] = useState(null);
     const [freeEvent, setFreeEvent] = useState(true);
     const { initPaymentSheet, presentPaymentSheet } = useStripe();
     const [loadingPayment, setLoadingPayment] = useState(false);
 
-    const { cardDetails: { name, poster, price, organizer, description } } = route.params;
+    const [alreadyRegistered, setAlreadyRegistered] = useState(false);
 
-    useEffect(() => { setFreeEvent(price === 0); }, []);
+
+    const { cardDetails: { $id, event_name, poster, price, organizer_name: { name: organizer }, event_description } } = route.params;
+
+    useEffect(() => {
+        setFreeEvent(price === 0);
+        setAlreadyRegistered(events.includes($id));
+    }, []);
 
     const handleTextLayout = useCallback((event) => {
         const { lines } = event.nativeEvent;
@@ -59,19 +69,24 @@ function EventScreen({ navigation, route }) {
     }
 
     const handleFreeEvent = async () => {
-        Toast.show({
-            type: 'success',
-            text1: 'Registered successfully!'
-        });
+        dbService.registerStudentInEvent(id, $id).then(res => {
+            if (res) {
+                Toast.show({
+                    type: 'success',
+                    text1: 'Registered successfully!'
+                });
+                setAlreadyRegistered(true);
+                setRegisteredEvents(prev => [$id, ...prev])
+            }
+        }).catch(e => console.log(e))
     }
-
 
     return (
         <SafeAreaView className='bg-white flex-1'>
 
             <Appbar.Header statusBarHeight={0} className='bg-white'>
                 <Appbar.BackAction onPress={() => navigation.pop()} />
-                <Appbar.Content title={name} />
+                <Appbar.Content title={event_name} />
             </Appbar.Header>
 
             <View className='flex-1 p-3 '>
@@ -97,12 +112,12 @@ function EventScreen({ navigation, route }) {
                     {showMore ?
                         <ScrollView className='max-h-48 '>
                             <Text className=' text-justify' onTextLayout={handleTextLayout}>
-                                {description}
+                                {event_description}
                             </Text>
                         </ScrollView>
                         :
                         <Text numberOfLines={NUM_OF_LINES} onTextLayout={handleTextLayout} className='text-justify'>
-                            {description}
+                            {event_description}
                         </Text>
                     }
 
@@ -141,9 +156,13 @@ function EventScreen({ navigation, route }) {
 
                 {
                     !isOrganizer && (
-                        loadingPayment
-                            ? <ActivityIndicator className='flex-1' />
-                            : <PaymentButton onPress={freeEvent ? handleFreeEvent : handlePayEvent} free={freeEvent} />
+                        alreadyRegistered
+                            ?
+                            <AlreadyRegisteredButton />
+                            :
+                            (loadingPayment
+                                ? <ActivityIndicator className='flex-1' />
+                                : <PaymentButton onPress={freeEvent ? handleFreeEvent : handlePayEvent} free={freeEvent} />)
                     )
                 }
             </View>

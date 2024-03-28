@@ -6,6 +6,8 @@ import { useNavigation } from '@react-navigation/native';
 function EventsList({ data, buttonLabel }) {
     const navigation = useNavigation();
 
+    console.log('data in eventslist--> ', data);
+
     return (
         <View className='flex-1'>
             <View className=' py-2 flex-1'>
@@ -18,12 +20,12 @@ function EventsList({ data, buttonLabel }) {
                             <EventCard
                                 buttonLabel={buttonLabel}
                                 imageUrl={item.poster.toString()}
-                                title={item.name}
+                                title={item.event_name}
                                 date={UTC2date(item.date)}
-                                organizer={item.organizer}
+                                organizer={item.organizer_name.name}
                                 time={UTC2time(item.date)}
                                 price={item.price}
-                                description={item.description}
+                                description={item.event_description}
                                 onPress={() => navigation.navigate('event_screen', { cardDetails: item })} />
                         )}
                     />

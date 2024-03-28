@@ -11,7 +11,7 @@ import { Client } from 'appwrite';
 import conf from '../../conf/conf';
 
 function Event() {
-    const { auth, setIsLoading, user: { isOrganizer } } = useAppwrite();
+    const { auth, setIsLoading, user: { isOrganizer, university } } = useAppwrite();
 
     const [eventsList, setEventsList] = useState([]);
 
@@ -20,31 +20,38 @@ function Event() {
         setIsLoading(true);
         dbService.allEvents().then((res) => {
             const allevnts = res.documents;
-            setEventsList(allevnts)
+            const filteredList = allevnts.filter(evnt => evnt.university_name.name === university);
+            console.log(res);
+            setEventsList(filteredList)
+            // console.log(allevnts);
         });
         setIsLoading(false);
     }
-    console.log('localStorage' in window);
 
     useEffect(() => {
-        console.log('events....');
         fetchEvents();
 
         const unsubscribe = auth.client.subscribe(`databases.${conf.db_id}.collections.${conf.event_collection_id}.documents`, response => {
             // If new event created
             if (response.events.includes("databases.*.collections.*.documents.*.create")) {
-                setEventsList(prev => [response.payload, ...prev]);
+                if (response.payload.university_name.name === university) {
+                    setEventsList(prev => [response.payload, ...prev]);
+                }
             }
 
             // If event is deleted
             if (response.events.includes("databases.*.collections.*.documents.*.delete")) {
-                setEventsList(prev => prev.filter(evnt => evnt.$id !== response.payload.$id));
+                if (response.payload.university_name.name === university) {
+                    setEventsList(prev => prev.filter(evnt => evnt.$id !== response.payload.$id));
+                }
             }
-            
+
             // If event is updated
             if (response.events.includes("databases.*.collections.*.documents.*.update")) {
-                setEventsList(prev => prev.filter(evnt => evnt.$id !== response.payload.$id));
-                setEventsList(prev => [response.payload, ...prev]);
+                if (response.payload.university_name.name === university) {
+                    setEventsList(prev => prev.filter(evnt => evnt.$id !== response.payload.$id));
+                    setEventsList(prev => [response.payload, ...prev]);
+                }
             }
             console.log(response);
         });

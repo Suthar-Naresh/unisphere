@@ -60,12 +60,31 @@ export class DBService {
 
     async allEvents() {
         try {
-            return await this.databases.listDocuments(conf.db_id, conf.event_collection_id,[Query.orderDesc("$createdAt")]);
+            return await this.databases.listDocuments(conf.db_id, conf.event_collection_id, [Query.orderDesc("$createdAt")]);
         } catch (error) {
             console.log(error);
             throw new Error("DBService::allEvents()::error", error);
         }
     }
+
+    async registerStudentInEvent(studentId, eventId) {
+        try {
+            return await this.databases.createDocument(conf.db_id, conf.event_attend_collection_id, ID.unique(), { student_id: studentId, event_id: eventId });
+        } catch (error) {
+            console.log(error);
+            throw new Error("DBService::registerStudentInEvent()::error", error);
+        }
+    }
+
+    async getAllregisteredEvents(userId) {
+        try {
+            return await this.databases.listDocuments(conf.db_id, conf.event_attend_collection_id, [Query.equal("student_id", userId)]);
+        } catch (error) {
+            console.log(error);
+            throw new Error("DBService::getAllregisteredEvents()::error", error);
+        }
+    }
+
 }
 
 const dbService = new DBService();

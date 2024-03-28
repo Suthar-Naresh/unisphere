@@ -18,4 +18,19 @@ function PaymentButton({ onPress, free = false }) {
     )
 }
 
+export function AlreadyRegisteredButton() {
+    return (
+        <View className=' flex-1'>
+            <View className=' flex-1'>
+                <Button
+                    mode='contained'
+                    className='absolute bottom-0 w-full rounded-md'
+                    disabled={true}
+                >
+                    Already Registered for the event
+                </Button>
+            </View>
+        </View>
+    )
+}
 export default PaymentButton
