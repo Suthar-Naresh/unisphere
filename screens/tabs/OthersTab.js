@@ -1,4 +1,5 @@
 import { Image, Text, View } from 'react-native'
+import { Appbar, Divider } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context'
 
 async function fetcher() {
@@ -17,8 +18,12 @@ function OthersTab({ navigation }) {
 
     return (
         <SafeAreaView className='bg-white flex-1'>
+            <Appbar.Header statusBarHeight={0} className='bg-white'>
+                <Appbar.Content title="Other Events" titleStyle={{ fontWeight: '600' }} />
+            </Appbar.Header>
+            <Divider />
+
             <View className=' flex-1 py-3 px-2 '>
-                <Text className='text-3xl font-semibold mb-5'>Others</Text>
                 <View className=' flex-1 my-auto'>
                     <Image source={require('../../assets/no_external_events_yet.jpg')} className='w-full h-5/6' />
                     <Text className=' text-center text-2xl self-center font-medium my-auto text-slate-800'>No external events yet</Text>

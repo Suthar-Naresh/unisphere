@@ -1,12 +1,27 @@
 import { Appbar, Button, Dialog, Portal, Text } from 'react-native-paper'
 import useAppwrite from '../context/appwriteAuthContext';
+import { useState } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-function AppBarWithDialog({ showDialog, hideDialog, handleLogout, visible }) {
-    const { user: { email, name, university, isOrganizer } } = useAppwrite();
+function AppBarWithDialog() {
+    const { auth, setIsLoggedIn, user: { email, name, university, isOrganizer } } = useAppwrite();
+
+    const [visible, setVisible] = useState(false);
+    const showDialog = () => setVisible(true);
+    const hideDialog = () => setVisible(false);
+
+    const handleLogout = () => {
+        auth.logout().then(() => {
+            AsyncStorage.removeItem('appwriteSession').then(() => {
+                console.log('Logged Out');
+                setIsLoggedIn(false);
+            })
+        });
+    }
 
     return (
         <>
-            <Appbar.Header className='bg-white'>
+            <Appbar.Header statusBarHeight={0} className='bg-white'>
                 <Appbar.Content title="UniSphere" titleStyle={{ fontWeight: '600' }} />
                 <Text className='font-semibold'>{name}</Text>
                 <Appbar.Action icon="account" onPress={showDialog} />

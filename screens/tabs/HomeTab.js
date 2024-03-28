@@ -1,23 +1,19 @@
 import { useEffect, useState } from 'react'
 import useAppwrite from '../../context/appwriteAuthContext'
 import { SafeAreaView } from 'react-native-safe-area-context';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import AppBarWithDialog from '../../components/AppBarWithDialog';
 import dbService from '../../appwrite/db';
 import AddEventFab from '../../components/AddEventFab';
 import EventList from '../../components/EventsList';
+import TopTab from './TopTab';
+import { Text, View } from 'react-native';
 
-
-function HomeTab({ navigation }) {
-    const { auth, setIsLoggedIn, setIsLoading, user: { isOrganizer } } = useAppwrite();
+function Event() {
+    const { setIsLoading, user: { isOrganizer } } = useAppwrite();
 
     const [eventsList, setEventsList] = useState([]);
 
-    const [visible, setVisible] = useState(false);
-    const showDialog = () => setVisible(true);
-    const hideDialog = () => setVisible(false);
-
-    useEffect(() => {
+    const fetchEvents = () => {
         console.log('😒😒😒😒😒😒😒😒');
         setIsLoading(true);
         dbService.allEvents().then((res) => {
@@ -25,38 +21,44 @@ function HomeTab({ navigation }) {
             setEventsList(allevnts)
         });
         setIsLoading(false);
-    }, []);
-
-    const handleLogout = () => {
-        auth.logout().then(() => {
-            AsyncStorage.removeItem('appwriteSession').then(() => {
-                console.log('Logged Out');
-                setIsLoggedIn(false);
-            })
-        });
     }
 
-    return (
-        <SafeAreaView className='flex-1'>
+    useEffect(() => {
+        fetchEvents();
+    }, []);
 
-            <AppBarWithDialog
-                visible={visible}
-                handleLogout={handleLogout}
-                hideDialog={hideDialog}
-                showDialog={showDialog}
-            />
+    return (
+        isOrganizer
+            ?
+            <EventList data={eventsList} buttonLabel='Read More' />
+            :
+            <EventList data={eventsList} buttonLabel='Book Now' />
+    )
+}
+
+function Notice() {
+    return (
+        <View>
+            <Text>Notice</Text>
+        </View>
+    )
+}
+
+function HomeTab() {
+    const { user: { isOrganizer } } = useAppwrite();
+    return (
+        <SafeAreaView className='flex-1 bg-white'>
+            <AppBarWithDialog />
 
             {
                 isOrganizer
                     ?
                     <AddEventFab>
-                        <EventList data={eventsList} buttonLabel='Read More' />
+                        <TopTab Event={Event} Notice={Notice} />
                     </AddEventFab>
                     :
-                    <EventList data={eventsList} buttonLabel='Book Now' />
+                    <TopTab Event={Event} Notice={Notice} />
             }
-
-
         </SafeAreaView>
     )
 }

@@ -69,7 +69,7 @@ function EventScreen({ navigation, route }) {
     return (
         <SafeAreaView className='bg-white flex-1'>
 
-            <Appbar.Header className='bg-white'>
+            <Appbar.Header statusBarHeight={0} className='bg-white'>
                 <Appbar.BackAction onPress={() => navigation.pop()} />
                 <Appbar.Content title={name} />
             </Appbar.Header>
