@@ -20,10 +20,12 @@
     "expo": "~50.0.11",
     "expo-splash-screen": "~0.26.4",
     "expo-status-bar": "~1.11.1",
+    "local-storage-fallback": "^4.1.2",
     "nativewind": "^2.0.11",
     "react": "18.2.0",
     "react-hook-form": "^7.51.0",
     "react-native": "0.73.4",
+    "react-native-pager-view": "6.2.3",
     "react-native-paper": "^5.12.3",
     "react-native-paper-dropdown": "^1.0.7",
     "react-native-razorpay": "^2.3.0",
@@ -32,8 +34,7 @@
     "react-native-tab-view": "^3.5.2",
     "react-native-toast-message": "^2.2.0",
     "react-native-vector-icons": "^10.0.3",
-    "zod": "^3.22.4",
-    "react-native-pager-view": "6.2.3"
+    "zod": "^3.22.4"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

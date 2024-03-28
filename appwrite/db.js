@@ -60,7 +60,7 @@ export class DBService {
 
     async allEvents() {
         try {
-            return await this.databases.listDocuments(conf.db_id, conf.event_collection_id);
+            return await this.databases.listDocuments(conf.db_id, conf.event_collection_id,[Query.orderDesc("$createdAt")]);
         } catch (error) {
             console.log(error);
             throw new Error("DBService::allEvents()::error", error);
