@@ -85,6 +85,15 @@ export class DBService {
         }
     }
 
+    async getAllregisteredEventsDetails(queries) {
+        try {
+            return await this.databases.listDocuments(conf.db_id, conf.event_collection_id, queries);
+        } catch (error) {
+            console.log(error);
+            throw new Error("DBService::getAllregisteredEventsDetails()::error", error);
+        }
+    }
+
 }
 
 const dbService = new DBService();

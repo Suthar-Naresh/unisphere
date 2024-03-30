@@ -1,3 +1,30 @@
+/*
+
+1. Create date object: new Date()
+EXAMPLES::
+    new Date()
+    new Date(value)
+    new Date(dateString)
+    new Date(dateObject)
+
+    new Date(year, monthIndex)
+    new Date(year, monthIndex, day)
+    new Date(year, monthIndex, day, hours)
+    new Date(year, monthIndex, day, hours, minutes)
+    new Date(year, monthIndex, day, hours, minutes, seconds)
+    new Date(year, monthIndex, day, hours, minutes, seconds, milliseconds)
+
+2. To get current date time: Date.now()
+    - It returns Unix Epoch
+    - Converts it to GMT time/Date object (i.e. IST in my case) by new Date(value)
+
+3. Date object to UTC: dateObject.toISOString()
+
+4. Convert UTC string to date: new Date(dateString)
+    - Returns Date object/GMT time
+
+*/
+
 function numberToMonth(n) {
     if (n === 0) return 'Jan'
     if (n === 1) return 'Feb'

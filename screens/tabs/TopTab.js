@@ -11,7 +11,7 @@ export default function TopTab({ Event, Notice }) {
             }}
         >
             <Tab.Screen name="events_top_tab" component={Event} options={{ title: 'Events' ,}} />
-            <Tab.Screen name="notice_top_tab" component={Notice} options={{ title: 'Notices' }} />
+            <Tab.Screen name="notice_top_tab" component={Notice} options={{ title: 'announcements' }} />
         </Tab.Navigator>
     );
 }

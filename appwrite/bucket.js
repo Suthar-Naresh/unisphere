@@ -1,35 +1,74 @@
-import { Client, Databases, ID, Storage } from 'appwrite';
+import { Client, ID, Storage } from 'appwrite';
 import conf from '../conf/conf';
 
-export class BucketService{
+export class BucketService {
     client = new Client();
     bucket;
 
-    constructor(){
+    constructor() {
         this.client
-        .setEndpoint(conf.endpoint)
-        .setProject(conf.project_id);
+            .setEndpoint(conf.endpoint)
+            .setProject(conf.project_id);
 
         this.bucket = new Storage(this.client);
     }
 
-    async uploadFile(file){
+    async uploadFile(file) {
         try {
-            return await this.bucket.createFile(conf.appwriteBucketID, ID.unique());
+            return await this.bucket.createFile(conf.bucket_id, ID.unique(), file);
         } catch (error) {
-            throw new Error("BucketService::uploadFile()::error", error);
+            console.log("BucketService::uploadFile()::error", error.type);
+            console.log(error);
+            throw new Error(error.message);
         }
     }
 
-    async deleteFile(fileId){
+    async uploadEventPoster(fileURI, fileType) {
+        try {
+            // Creating file type which is required by the multipart form data
+            const file = {
+                uri: fileURI,
+                name: `File_${Date.now()}`,
+                type: fileType,
+            };
+            
+            // Construct the multipart/form-data payload
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('fileId', ID.unique());
+            
+            const response = await fetch(`${conf.endpoint}/storage/buckets/${conf.bucket_id}/files`, {
+                method: 'POST',
+                headers: {
+                    'X-Appwrite-Project': conf.project_id,
+                },
+                body: formData,
+            });
+            
+            // Parse the JSON response
+            const data = await response.json();
+            console.log('Upload response:', data);
+            
+            if (data) {
+                const posterURL = `${conf.endpoint}/storage/buckets/${conf.bucket_id}/files/${data.$id}/preview?project=${conf.project_id}`;
+                return posterURL
+            }
+        } catch (error) {
+            console.error('Error uploading image:', error);
+        }
+    }
+
+    async deleteFile(fileId) {
         try {
             await this.bucket.deleteFile(conf.appwriteBucketID, fileId);
         } catch (error) {
-            throw new Error("BucketService::deleteFile()::error", error);
+            console.log("BucketService::deleteFile()::error", error.type);
+            console.log(error);
+            throw new Error(error.message);
         }
     }
 
-    async getFilePreview(fileId){
+    async getFilePreview(fileId) {
         try {
             return this.bucket.getFilePreview(conf.bucket_id, fileId);
         } catch (error) {
@@ -37,7 +76,7 @@ export class BucketService{
         }
     }
 
-    async getPoster(fileId){
+    async getPoster(fileId) {
         try {
             return this.bucket.getFile(conf.bucket_id, fileId);
         } catch (error) {
@@ -45,7 +84,7 @@ export class BucketService{
         }
     }
 
-    async getAllPosters(){
+    async getAllPosters() {
         try {
             return await this.bucket.listFiles(conf.bucket_id);
         } catch (error) {
