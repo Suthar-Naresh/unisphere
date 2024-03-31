@@ -27,9 +27,9 @@ function SignUpScreen({ navigation }) {
 
     useEffect(() => {
         dbService.getUniversities().then((res) => {
-            const x = res.documents.map(({ name }) => (name));
-            //   console.log(x);
-            // console.log('Fetching details');
+            const x = res.documents.map(({ name, $id }) => ({ name, id: $id }));
+            // console.log(x);
+
             setUniversityList(x);
         });
     }, []);
@@ -39,10 +39,10 @@ function SignUpScreen({ navigation }) {
     }
 
     const handleSignUP = async (signUpFormData) => {
-        
+
         try {
             const session = await auth.createAccount({ name: signUpFormData.signup_name, email: signUpFormData.signup_email, password: signUpFormData.signup_password });
-            
+
             if (session) {
                 setIsLoading(true);
                 // console.log('account created!');
@@ -51,7 +51,8 @@ function SignUpScreen({ navigation }) {
                     const student = await dbService.createStudent({ name: signUpFormData.signup_name, email: signUpFormData.signup_email, university: signUpFormData.signup_universityName });
                     if (student) {
                         console.log('Sign-up screen --> session:', session);
-                        await auth.addUniversityName(signUpFormData.signup_universityName);
+                        const creespondingId = universityList.find(uni => uni.name === signUpFormData.signup_universityName).id;
+                        await auth.addUniversity(signUpFormData.signup_universityName, creespondingId);
 
                         reset({
                             'signup_name': '',
@@ -95,7 +96,7 @@ function SignUpScreen({ navigation }) {
                         <Dropdown
                             name='signup_universityName'
                             label='Select University'
-                            dropDownList={universityList}
+                            dropDownList={universityList.map(u => (u.name))}
                             control={control}
                             formErrors={errors}
                         />

@@ -106,11 +106,31 @@ export class DBService {
         }
     }
 
-    async getAnnouncements(queries=[]) {
+    async getAnnouncements(queries = []) {
         try {
             return await this.databases.listDocuments(conf.db_id, conf.announcements_collection_id, queries);
         } catch (error) {
             console.log("DBService::getAnnouncements()::error", error.type);
+            console.log(error);
+            throw new Error(error.message);
+        }
+    }
+
+    async createAnnouncement(title, description) {
+        /*
+        title
+        description
+        date
+        university(relation to university)
+        organizer(relation to organizer)
+        */
+
+        try {
+            return await this.databases.createDocument(conf.db_id, conf.student_collection_id, ID.unique(),
+                { title, description, }
+            );
+        } catch (error) {
+            console.log("DBService::createAnnouncement()::error", error.type);
             console.log(error);
             throw new Error(error.message);
         }

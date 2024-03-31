@@ -10,6 +10,7 @@ const INIT_USER = {
     name: "",
     email: "",
     university: "",
+    university_id: "",
     isOrganizer: false
 };
 
@@ -38,11 +39,11 @@ export const AppwriteProvider = ({ children }) => {
             console.log('User is already logged in');
 
             // check for user pref for university
-            const { university } = await auth.getUniversity();
+            const { university, university_id } = await auth.getUniversity();
 
             // check if user is part of organization team
             const teams = await teamService.getTeamsOfUser();
-            const isOrganizer = teams.teams.some(({$id})=>$id===conf.organizers_team_id);
+            const isOrganizer = teams.teams.some(({ $id }) => $id === conf.organizers_team_id);
             // array.some(num => num % 2 === 0)
             // console.log(teams);
 
@@ -52,7 +53,8 @@ export const AppwriteProvider = ({ children }) => {
                 name: sessionInfo.name,
                 email: sessionInfo.email,
                 university: university || 'Man i do\'n go to college',
-                isOrganizer: isOrganizer
+                university_id:university_id,
+                isOrganizer: isOrganizer,
             });
 
         } else {

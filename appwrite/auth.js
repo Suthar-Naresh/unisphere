@@ -55,11 +55,11 @@ export class AuthService{
         }
     }
 
-    async addUniversityName(university){
+    async addUniversity(university,university_id){
         try {
-            return await this.account.updatePrefs({university});
+            return await this.account.updatePrefs({university,university_id});
         } catch (error) {
-            console.log("AuthService::addUniversityName()::error", error.type);
+            console.log("AuthService::addUniversity()::error", error.type);
             console.log(error);
             throw new Error(error.message);
         }
