@@ -14,15 +14,13 @@ import useAppwrite from '../context/appwriteAuthContext';
 
 function AddAnoucement() {
     const { control, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm({ resolver: zodResolver(AnnouncementSchema) });
-    const { user: { id, university_id } } = useAppwrite();
-
-    console.log('🐽🐽🐽🐽🐽🐽', id);
+    const { user: { docID, university_id } } = useAppwrite();
 
     const nvigation = useNavigation();
 
     const handleCreateAnnouncement = async (announcementFormData) => {
         console.log(announcementFormData);
-        const res = await dbService.createAnnouncement(announcementFormData.announcement_title, announcementFormData.announcement_description, university_id, id);
+        const res = await dbService.createAnnouncement(announcementFormData.announcement_title, announcementFormData.announcement_description, university_id, docID);
 
         if (res) {
             console.log('announcement created!');

@@ -107,7 +107,7 @@ export class DBService {
 
         try {
             return await this.databases.createDocument(conf.db_id, conf.announcements_collection_id, ID.unique(),
-                { title, description, university: uniId, organizer: orgId, date: current }
+                { title, description, university_id: uniId, organizer: orgId, date: current }
             );
         } catch (error) {
             console.log("DBService::createAnnouncement()::error", error.type);
