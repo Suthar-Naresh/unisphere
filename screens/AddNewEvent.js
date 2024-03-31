@@ -2,7 +2,6 @@ import { Alert, Image, KeyboardAvoidingView, Platform, Pressable, ScrollView, Te
 import { Appbar, Button, Dialog, Divider, HelperText, Portal, RadioButton, Switch, TextInput } from 'react-native-paper'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import * as ImagePicker from 'expo-image-picker';
-import { ID } from "appwrite"
 
 // form imports
 import { Controller, useForm } from 'react-hook-form';
@@ -14,6 +13,8 @@ import DatePicker from '../components/DatePicker';
 import TimePicker from '../components/TimePicker';
 import bucketService from '../appwrite/bucket';
 import conf from '../conf/conf';
+import DateTimePicker from '../components/DateTimePicker';
+import { useNavigation } from '@react-navigation/native';
 
 function ImageViewer({ selectedImage }) {
   const imageSource = selectedImage ? { uri: selectedImage } : require('../assets/upload_event_poster.jpg');
@@ -25,7 +26,8 @@ function ImageViewer({ selectedImage }) {
 
 
 function AddNewEvent() {
-  const { control, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm({ resolver: zodResolver(EventSchema) });
+  const { control, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm({ resolver: zodResolver() });
+  const nvigation = useNavigation();
 
   const [selectedImage, setSelectedImage] = useState(null);
   const [selectedImageFile, setSelectedImageFile] = useState(null);
@@ -74,6 +76,7 @@ function AddNewEvent() {
     <SafeAreaView className='flex-1 bg-white'>
 
       <Appbar.Header statusBarHeight={0} className='bg-white'>
+        <Appbar.BackAction onPress={() => nvigation.pop()} />
         <Appbar.Content title='Create new event' />
       </Appbar.Header>
 
@@ -102,62 +105,10 @@ function AddNewEvent() {
               formErrors={errors}
             />
 
-            <InputBox
-              name='event_date'
-              label='Event date'
-              placeholder='DD/MM/YYYY'
-              icon='calendar'
-              control={control}
-              formErrors={errors}
-            />
-
-            <InputBox
-              name='event_start'
-              label='Event start time'
-              placeholder='HH:MM AM/PM'
-              icon='clock'
-              control={control}
-              formErrors={errors}
-            />
-
-            <InputBox
-              name='event_end'
-              label='Event end time'
-              placeholder='HH:MM AM/PM'
-              icon='clock'
-              control={control}
-              formErrors={errors}
-            />
-
-            <InputBox
-              name='event_start_registration'
-              label='Event registration start'
-              placeholder='DD/MM/YYYY HH:MM'
-              icon='calendar-clock'
-              control={control}
-              formErrors={errors}
-            />
-
-            <InputBox
-              name='event_end_registration'
-              label='Event registration end'
-              placeholder='DD/MM/YYYY HH:MM'
-              icon='calendar-clock'
-              control={control}
-              formErrors={errors}
-            />
-
-            {/* <DatePicker
-              placeholder='Event date'
-              label='Event date'
-              icon='calendar'
-            />
-
-            <TimePicker
-              placeholder='Registration start date'
-              label='Registration start date'
-              icon='clock-outline'
-            /> */}
+            <DateTimePicker placeholder='Event starts' />
+            <DateTimePicker placeholder='Event ends' />
+            <DateTimePicker placeholder='Registration starts' />
+            <DateTimePicker placeholder='Registration ends' />
 
             <InputBox
               name='event_description'
@@ -182,19 +133,10 @@ function AddNewEvent() {
               </RadioButton.Group>
             </View>
 
-            <Controller
-              control={control}
-              name='isPaid'
-
-              render={({ field: { onBlur, value, onChange } }) => (
-                <View className='bg-red- flex flex-row w-11/12 items-center justify-between'>
-                  <Text>Paid</Text>
-                  <Switch value={isSwitchOn} onValueChange={onToggleSwitch} className='' />
-                  {errors['isPaid'] && <HelperText type="error" >{errors['isPaid'].message}</HelperText>}
-                </View>
-              )}
-            />
-
+            <View className='bg-red- flex flex-row w-11/12 items-center justify-between'>
+              <Text>Paid</Text>
+              <Switch value={isSwitchOn} onValueChange={onToggleSwitch} className='' />
+            </View>
 
             <InputBox
               name='event_description'
@@ -211,7 +153,7 @@ function AddNewEvent() {
               icon="plus-box"
               mode="contained"
               className="w-11/12 rounded-md mb-5"
-              onPress={handleSubmit(handleCreateEvent)}
+              onPress={(handleCreateEvent)}
             // disabled={isSubmitting}
             >
               Create event

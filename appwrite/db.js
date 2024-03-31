@@ -94,6 +94,28 @@ export class DBService {
         }
     }
 
+    async createTransaction(userId, eventId, txnId) {
+        try {
+            return await this.databases.createDocument(conf.db_id, conf.txns_collection_id, ID.unique(),
+                { userId, eventId, txn_id: txnId }
+            );
+        } catch (error) {
+            console.log("DBService::createTransaction()::error", error.type);
+            console.log(error);
+            throw new Error(error.message);
+        }
+    }
+
+    async getAnnouncements(queries=[]) {
+        try {
+            return await this.databases.listDocuments(conf.db_id, conf.announcements_collection_id, queries);
+        } catch (error) {
+            console.log("DBService::getAnnouncements()::error", error.type);
+            console.log(error);
+            throw new Error(error.message);
+        }
+    }
+
 }
 
 const dbService = new DBService();

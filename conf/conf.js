@@ -10,6 +10,9 @@ const conf = {
     function_id: String(process.env.EXPO_PUBLIC_APPWRITE_FUNCTION_ID),
     event_attend_collection_id: String(process.env.EXPO_PUBLIC_APPWRITE_EVENT_ATTEND_COLLECTION_ID),
     stripe_publishable_key: String(process.env.EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY),
+    txns_collection_id: String(process.env.EXPO_PUBLIC_APPWRITE_TRANSACTIONS_COLLECTION_ID),
+    announcements_collection_id: String(process.env.EXPO_PUBLIC_APPWRITE_ANNOUNCEMENTS_COLLECTION_ID),
+    
 }
 
 export default conf;

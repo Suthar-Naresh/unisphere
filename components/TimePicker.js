@@ -5,6 +5,7 @@ import { TimePickerModal, tr } from 'react-native-paper-dates'
 
 function TimePicker({ placeholder, label, icon }) {
     const current = new Date();
+    
     const [visible, setVisible] = useState(false);
     const [hours, setHours] = useState(current.getHours());
     const [minutes, setMinutes] = useState(current.getMinutes());
@@ -31,8 +32,8 @@ function TimePicker({ placeholder, label, icon }) {
                 label={label}
                 // disabled={true}
                 mode='outlined'
+                editable={false}
                 value={`${hours}:${minutes}`}
-                // onChangeText={onChange}
                 // onBlur={onBlur}
                 left={<TextInput.Icon icon={icon} onPress={() => setVisible(true)} />}
             // error={formErrors[name] ? true : false}

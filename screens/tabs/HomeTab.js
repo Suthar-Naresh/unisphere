@@ -6,22 +6,30 @@ import dbService from '../../appwrite/db';
 import AddEventFab from '../../components/AddEventFab';
 import EventList from '../../components/EventsList';
 import TopTab from './TopTab';
-import { Text, View } from 'react-native';
+import { FlatList, Text, View } from 'react-native';
 import { Client } from 'appwrite';
 import conf from '../../conf/conf';
-import { Button, Card, TextInput, Title } from 'react-native-paper';
+import { ActivityIndicator, Button, Card, TextInput, Title } from 'react-native-paper';
+import useRegisteredEvents from '../../context/registeredEventsContext';
+import { useNavigation } from '@react-navigation/native';
+import { UTC2date } from '../../utils/dateTimeFormat';
 
 function Event() {
     const { auth, setIsLoading, user: { isOrganizer, university } } = useAppwrite();
+    const { events } = useRegisteredEvents();
 
     const [eventsList, setEventsList] = useState([]);
+    const [loading, setLoading] = useState(false);
 
     const fetchEvents = () => {
         console.log('😒😒😒😒😒😒😒😒');
         setIsLoading(true);
         dbService.allEvents().then((res) => {
+
             const allevnts = res.documents;
-            const filteredList = allevnts.filter(evnt => evnt.university_name.name === university);
+            const filteredListByUni = allevnts.filter(evnt => evnt.university_name.name === university);
+            const filteredList = filteredListByUni.filter(evt => !events.includes(evt.$id));
+
             console.log(res);
             setEventsList(filteredList)
             // console.log(allevnts);
@@ -30,7 +38,9 @@ function Event() {
     }
 
     useEffect(() => {
+        // setLoading(true);
         fetchEvents();
+        // setLoading(false);
 
         const unsubscribe = auth.client.subscribe(`databases.${conf.db_id}.collections.${conf.event_collection_id}.documents`, response => {
             // If new event created
@@ -58,11 +68,15 @@ function Event() {
         });
 
         // Closes the subscription.
-
         return () => {
             unsubscribe();
         }
-    }, []);
+    }, [events]);
+
+
+    // if (loading) {
+    //     return <ActivityIndicator className='my-auto' />;
+    // }
 
     return (
         isOrganizer
@@ -73,36 +87,61 @@ function Event() {
     )
 }
 
+function NoticeCard({ onPress, title, description, organizer, noticeDate }) {
+
+    return (
+        <Card style={{ margin: 16 }} contentStyle={{ margin: 16 }}>
+            <View className='flex flex-row justify-between items-center'>
+                <Title className='font-bold text-xl'>{title}</Title>
+            </View>
+
+            <Card.Content className='space-y-3'>
+                <View className=' flex flex-row items-center justify-between'>
+                    <Text variant="titleLarge">{organizer}</Text>
+                    <View className='space-x-8'>
+                        <TextInput.Icon icon='calendar' />
+                        <Text variant="titleLarge">{UTC2date(noticeDate)}</Text>
+                    </View>
+                </View>
+                <Text variant="titleLarge" numberOfLines={3}>{description}</Text>
+            </Card.Content>
+
+            <Card.Actions>
+                <Button mode='contained' className='rounded-md' onPress={onPress} >Read</Button>
+            </Card.Actions>
+        </Card>
+    )
+}
+
 function Notice() {
-    const desc = 'Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature, discovered the undoubtable source. Lorem Ipsum comes from sections 1.10.32 and 1.10.33 of "de Finibus Bonorum et Malorum" (The Extremes of Good and Evil) by Cicero, written in 45 BC. This book is a treatise on the theory of ethics, very popular during the Renaissance. The first line of Lorem Ipsum, "Lorem ipsum dolor sit amet..", comes from a line in section 1.10.32.    '
+    const { navigate } = useNavigation();
+    const [notices, setNotices] = useState([]);
+    const {  user: { university } } = useAppwrite();
+
     useEffect(() => {
+        dbService.getAnnouncements().then(res => {
+            console.log(res);
+            setNotices(res.documents.filter(ntc=>ntc.university.name===university));
+        })
         console.log('notice....');
     }, [])
+
     return (
-        <View>
-            <Text>Notice</Text>
-            <Card style={{ margin: 16 }} contentStyle={{ margin: 16 }}>
-                <View className='flex flex-row justify-between items-center'>
-                    <Title className='font-bold text-xl'>{'Cancellation of MSE '}</Title>
-                </View>
+        <FlatList
+            className=''
+            keyExtractor={(item, index) => item.$id}
+            data={notices}
+            renderItem={({ item }) => (
+                <NoticeCard
+                    description={item.description}
+                    title={item.title}
+                    noticeDate={item.date}
+                    organizer={item.organizer.name}
+                    onPress={() => navigate('notice_screen', { cardDetails: item })}
+                />
+            )}
+        />
 
-                <Card.Content className='space-y-3'>
-                    <View className=' flex flex-row items-center justify-between'>
-                        <Text variant="titleLarge">{'Student Corner'}</Text>
-                        <View className='space-x-8'>
-                            <TextInput.Icon icon='calendar' />
-                            <Text variant="titleLarge">{'22 Feb, 2024'}</Text>
-                        </View>
-                    </View>
-                    <Text variant="titleLarge" numberOfLines={3}>{desc}</Text>
-                </Card.Content>
-
-                <Card.Actions>
-                    <Button mode='contained' className='rounded-md' onPress={() => { }} >{'Read'}</Button>
-                </Card.Actions>
-
-            </Card>
-        </View>
     )
 }
 

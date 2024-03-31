@@ -50,22 +50,43 @@ function EventScreen({ navigation, route }) {
         const res = await functionService.createPaymentIntent(price);
         console.log(typeof res);
         console.log(res);
+        const paymentIntentClientSecret = JSON.parse(res).paymentIntent
+
         if (!res) console.log('something went wrong!!!!');
 
         // initialize payment sheet
         const initResponse = await initPaymentSheet({
             merchantDisplayName: 'UniSphere',
             defaultBillingDetails: { address: { country: 'IN' } },
-            paymentIntentClientSecret: JSON.parse(res).paymentIntent,
+            paymentIntentClientSecret: paymentIntentClientSecret,
         });
 
         if (initResponse.error) console.log('error.....');
 
         // present payment sheet from stripe
         const paymentResponse = await presentPaymentSheet();
-        if (paymentResponse.error) console.log('Pressed close payment sheet.', paymentResponse.error.code);
+        console.log(paymentResponse);
 
-        setLoadingPayment(false);
+        if (paymentResponse.error) {
+            console.log('Pressed close payment sheet.', paymentResponse.error.code);
+            setLoadingPayment(false);
+            return;
+        } else {
+            try {
+                const res = await dbService.createTransaction(id, $id, paymentIntentClientSecret);
+                if (!res) {
+                    console.log('something went wrong ☠️');
+                }
+                console.log('done payment!');
+                await handleFreeEvent();
+
+            } catch (error) {
+                console.log('ERROR!! 💵💵💵💵', error);
+            }
+
+            setLoadingPayment(false);
+        }
+
     }
 
     const handleFreeEvent = async () => {
