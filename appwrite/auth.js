@@ -1,22 +1,22 @@
 import { Account, Client, ID } from 'appwrite';
 import conf from '../conf/conf';
 
-export class AuthService{
+export class AuthService {
     client = new Client();
     account;
 
-    constructor(){
+    constructor() {
         this.client
-        .setEndpoint(conf.endpoint)
-        .setProject(conf.project_id);
+            .setEndpoint(conf.endpoint)
+            .setProject(conf.project_id);
 
         this.account = new Account(this.client);
     }
 
-    async createAccount({name, email, password}){
+    async createAccount({ name, email, password }) {
         try {
             const userAccount = await this.account.create(ID.unique(), email, password, name);
-            if(userAccount) return this.login({email, password});
+            if (userAccount) return this.login({ email, password });
             return userAccount;
         } catch (error) {
             console.log("AuthService::createAccount()::error", error.type);
@@ -25,9 +25,9 @@ export class AuthService{
         }
     }
 
-    async login({email, password}){
+    async login({ email, password }) {
         try {
-            return await this.account.createEmailSession(email,password);
+            return await this.account.createEmailSession(email, password);
         } catch (error) {
             console.log("AuthService::login()::error", error.type);
             console.log(error);
@@ -35,7 +35,7 @@ export class AuthService{
         }
     }
 
-    async logout(){
+    async logout() {
         try {
             await this.account.deleteSession('current');
         } catch (error) {
@@ -45,7 +45,7 @@ export class AuthService{
         }
     }
 
-    async getCurrentUser(){
+    async getCurrentUser() {
         try {
             return await this.account.get();
         } catch (error) {
@@ -55,9 +55,9 @@ export class AuthService{
         }
     }
 
-    async addUniversity(university,university_id){
+    async addUserPrefInfo(university, university_id, docID) {
         try {
-            return await this.account.updatePrefs({university,university_id});
+            return await this.account.updatePrefs({ university, university_id, docID });
         } catch (error) {
             console.log("AuthService::addUniversity()::error", error.type);
             console.log(error);
@@ -65,7 +65,7 @@ export class AuthService{
         }
     }
 
-    async getUniversity(){
+    async getUserPrefInfo() {
         try {
             return await this.account.getPrefs();
         } catch (error) {

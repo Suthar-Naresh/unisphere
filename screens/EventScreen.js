@@ -16,7 +16,7 @@ const NUM_OF_LINES = 3;
 
 function EventScreen({ navigation, route }) {
 
-    const { auth, user: { isOrganizer, id } } = useAppwrite();
+    const { user: { isOrganizer, docID } } = useAppwrite();
     const { events, setRegisteredEvents } = useRegisteredEvents();
 
     const [showMore, setShowMore] = useState(false);
@@ -73,7 +73,7 @@ function EventScreen({ navigation, route }) {
             return;
         } else {
             try {
-                const res = await dbService.createTransaction(id, $id, paymentIntentClientSecret);
+                const res = await dbService.createTransaction(docID, $id, paymentIntentClientSecret);
                 if (!res) {
                     console.log('something went wrong ☠️');
                 }
@@ -90,7 +90,8 @@ function EventScreen({ navigation, route }) {
     }
 
     const handleFreeEvent = async () => {
-        dbService.registerStudentInEvent(id, $id).then(res => {
+        console.log('➡️➡️➡️',docID);
+        dbService.registerStudentInEvent(docID, $id).then(res => {
             if (res) {
                 Toast.show({
                     type: 'success',

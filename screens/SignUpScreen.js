@@ -52,7 +52,7 @@ function SignUpScreen({ navigation }) {
                     if (student) {
                         console.log('Sign-up screen --> session:', session);
                         const creespondingId = universityList.find(uni => uni.name === signUpFormData.signup_universityName).id;
-                        await auth.addUniversity(signUpFormData.signup_universityName, creespondingId);
+                        await auth.addUserPrefInfo(signUpFormData.signup_universityName, creespondingId, student.$id);
 
                         reset({
                             'signup_name': '',

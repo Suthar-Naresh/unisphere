@@ -23,32 +23,6 @@ export class DBService {
         }
     }
 
-    async updatePost(docID, { title, content, image, isPublished }) {
-        try {
-            return await this.databases.updateDocument(conf.appwriteDatabaseID, conf.appwriteCollectionID, docID,
-                { title, content, image, isPublished }
-            );
-        } catch (error) {
-            throw new Error("DBService::updatePost()::error", error);
-        }
-    }
-
-    async deletePost(docID) {
-        try {
-            await this.databases.deleteDocument(conf.appwriteDatabaseID, conf.appwriteCollectionID, docID);
-        } catch (error) {
-            throw new Error("DBService::deletePost()::error", error);
-        }
-    }
-
-    async getPost(docID) {
-        try {
-            return await this.databases.getDocument(conf.appwriteDatabaseID, conf.appwriteCollectionID, docID);
-        } catch (error) {
-            throw new Error("DBService::getPost()::error", error);
-        }
-    }
-
     async getUniversities() {
         try {
             return await this.databases.listDocuments(conf.db_id, conf.university_collection_id);
@@ -58,9 +32,14 @@ export class DBService {
         }
     }
 
-    async allEvents() {
+    async allEvents(university_id) {
         try {
-            return await this.databases.listDocuments(conf.db_id, conf.event_collection_id, [Query.orderDesc("$createdAt")]);
+            return await this.databases.listDocuments(conf.db_id, conf.event_collection_id,
+                [
+                    Query.equal("university_id", university_id),
+                    Query.orderDesc("$createdAt")
+                ]
+            );
         } catch (error) {
             console.log(error);
             throw new Error("DBService::allEvents()::error", error);
@@ -71,8 +50,9 @@ export class DBService {
         try {
             return await this.databases.createDocument(conf.db_id, conf.event_attend_collection_id, ID.unique(), { student_id: studentId, event_id: eventId });
         } catch (error) {
+            console.log("DBService::registerStudentInEvent()::error", error.type);
             console.log(error);
-            throw new Error("DBService::registerStudentInEvent()::error", error);
+            throw new Error(error.message);
         }
     }
 
@@ -106,9 +86,14 @@ export class DBService {
         }
     }
 
-    async getAnnouncements(queries = []) {
+    async getAnnouncements(university_id) {
         try {
-            return await this.databases.listDocuments(conf.db_id, conf.announcements_collection_id, queries);
+            return await this.databases.listDocuments(conf.db_id, conf.announcements_collection_id,
+                [
+                    Query.equal("university_id", university_id),
+                    Query.orderDesc("$createdAt")
+                ]
+            );
         } catch (error) {
             console.log("DBService::getAnnouncements()::error", error.type);
             console.log(error);
@@ -116,18 +101,13 @@ export class DBService {
         }
     }
 
-    async createAnnouncement(title, description) {
-        /*
-        title
-        description
-        date
-        university(relation to university)
-        organizer(relation to organizer)
-        */
+    async createAnnouncement(title, description, uniId, orgId) {
+
+        const current = new Date().toISOString();
 
         try {
-            return await this.databases.createDocument(conf.db_id, conf.student_collection_id, ID.unique(),
-                { title, description, }
+            return await this.databases.createDocument(conf.db_id, conf.announcements_collection_id, ID.unique(),
+                { title, description, university: uniId, organizer: orgId, date: current }
             );
         } catch (error) {
             console.log("DBService::createAnnouncement()::error", error.type);
