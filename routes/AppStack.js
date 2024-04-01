@@ -6,6 +6,7 @@ import AddAnoucement from "../screens/AddAnoucement";
 import NoticeScreen from "../screens/NoticeScreen";
 import AddNewEvent from "../screens/AddNewEvent";
 import { RegisteredEventsProvider } from "../context/registeredEventsContext";
+import MyEventScreen from "../screens/MyEventScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -22,6 +23,7 @@ const AppStack = () => {
                 <Stack.Screen name="add_event_screen" component={AddNewEvent} />
                 <Stack.Screen name="add_anoucement_screen" component={AddAnoucement} />
                 <Stack.Screen name="notice_screen" component={NoticeScreen} />
+                <Stack.Screen name="my_event_screen" component={MyEventScreen} />
             </Stack.Navigator>
         </RegisteredEventsProvider>
 

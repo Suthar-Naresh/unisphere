@@ -17,8 +17,9 @@ const signUpSchema = z.object({
 });
 
 const EventSchema = z.object({
-  event_name: z.string().min(1).max(255),
+  event_name: z.string().min(1,'Event name is required.').max(30,'Event title can\'t be grater than than 30 characters.'),
   event_description: z.string().min(1).max(2048),
+  event_venue: z.string().min(1,'Please provide event venue/location.').max(1048),
 });
 
 const AnnouncementSchema = z.object({

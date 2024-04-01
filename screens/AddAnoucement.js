@@ -10,6 +10,7 @@ import InputBox from '../components/InputBox';
 import { useNavigation } from '@react-navigation/native';
 import dbService from '../appwrite/db';
 import useAppwrite from '../context/appwriteAuthContext';
+import Toast from 'react-native-toast-message';
 
 function AddAnoucement() {
     const { control, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm({ resolver: zodResolver(AnnouncementSchema) });
@@ -23,6 +24,11 @@ function AddAnoucement() {
 
         if (res) {
             console.log('announcement created!');
+            Toast.show({
+                type: 'success',
+                text1: 'Announcement made!'
+            });
+
             reset({
                 'announcement_title': '',
                 'announcement_description': ''

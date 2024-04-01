@@ -7,24 +7,13 @@ import dbService from '../../appwrite/db';
 import { Query } from 'appwrite';
 import EventCard from '../../components/EventCard';
 import { UTC2date, UTC2time } from '../../utils/dateTimeFormat';
+import { useNavigation } from '@react-navigation/native';
+import useAppwrite from '../../context/appwriteAuthContext';
+import OrganizerMyEvents from '../../components/OrganizerMyEvents';
+import StudentMyEvents from '../../components/StudentMyEvents';
 
 function MyEventsTab() {
-    const { events } = useRegisteredEvents();
-    const [myEvents, setMyEvents] = useState([]);
-
-    useEffect(() => {
-        if (events.length > 0) {
-            dbService.getAllregisteredEventsDetails(
-                [
-                    Query.equal('$id', events)
-                ]
-            ).then(res => {
-                console.log('my events:::::::>', res.documents);
-                setMyEvents(res.documents);
-            });
-        }
-
-    }, [events]);
+    const { user: { isOrganizer } } = useAppwrite();
 
 
     return (
@@ -34,40 +23,8 @@ function MyEventsTab() {
             </Appbar.Header>
             <Divider />
 
-            {
-                events.length === 0
-                    ?
-                    <View className=' flex-1 py-3 px-2 '>
-                        <View className=' flex-1 my-auto'>
-                            <Image source={require('../../assets/no_events.jpg')} className='w-full h-5/6' />
-                            <Text className=' text-center text-2xl self-center font-medium my-auto text-slate-800'>Nothing in your events</Text>
-                        </View>
-                    </View>
-                    :
-                    <View className='flex-1'>
-                        <View className=' py-2 flex-1'>
-                            <View className=''>
-                                <FlatList
-                                    className=''
-                                    keyExtractor={(item, index) => item.$id}
-                                    data={myEvents}
-                                    renderItem={({ item }) => (
-                                        <EventCard
-                                            buttonLabel='View'
-                                            imageUrl={item.poster.toString()}
-                                            title={item.event_name}
-                                            date={UTC2date(item.date)}
-                                            organizer={item.organizer_name.name}
-                                            time={UTC2time(item.date)}
-                                            price={item.price}
-                                            description={item.event_description}
-                                            onPress={() => navigation.navigate('event_screen', { cardDetails: item })} />
-                                    )}
-                                />
-                            </View>
-                        </View>
-                    </View>
-            }
+            {isOrganizer ? <OrganizerMyEvents /> : <StudentMyEvents />}
+
         </SafeAreaView>
     )
 }

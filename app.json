@@ -30,7 +30,15 @@
       [
         "expo-image-picker",
         {
-          "photosPermission": "The app accesses your photos to let you share them with your friends."
+          "photosPermission": "Allow UniSphere to access your photos."
+        }
+      ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow UniSphere to access your camera",
+          "microphonePermission": "Allow UniSphere to access your microphone",
+          "recordAudioAndroid": true
         }
       ]
     ]

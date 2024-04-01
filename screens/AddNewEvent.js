@@ -14,6 +14,7 @@ import { EventSchema } from '../utils/formSchema';
 import useAppwrite from '../context/appwriteAuthContext';
 import dbService from "../appwrite/db"
 import bucketService from "../appwrite/bucket"
+import Toast from 'react-native-toast-message';
 
 function ImageViewer({ selectedImage }) {
   const imageSource = selectedImage ? { uri: selectedImage } : require('../assets/upload_event_poster.jpg');
@@ -102,7 +103,19 @@ function AddNewEvent() {
     }
   }
 
+  function formCleanUp() {
+    reset({
+      'event_name': '',
+      'event_description': '',
+      'event_venue': '',
+    });
 
+    setSelectedImage(null);
+    setSelectedImageFile(null);
+    setValue('uni_only');
+    setIsSwitchOn(false);
+    setEventPrice(null);
+  }
 
   const handleCreateEvent = async (eventFormData) => {
 
@@ -118,15 +131,23 @@ function AddNewEvent() {
       registration_start: regBegin.toISOString(),
       registration_end: regEnds.toISOString(),
       organizer_name: docID,
+      venue: eventFormData.event_venue,
       university_id
     }
 
     if (selectedImage && selectedImageFile) {
       posterURL = await bucketService.uploadEventPoster(selectedImage, selectedImageFile.mimeType);
       console.log(posterURL);
-      dbService.createNewEvent(posterURL, formData);
-      
-      
+      const res = await dbService.createNewEvent(posterURL, formData);
+
+      if (res) {
+        Toast.show({
+          type: 'success',
+          text1: 'Event Created!'
+        });
+        formCleanUp();
+      }
+
     } else {
       Alert.alert('No event poster!', 'You did not select any image. Therefore default event poster will be shown on this event. Do you want to create event?', [
         {
@@ -136,174 +157,191 @@ function AddNewEvent() {
         },
         {
           text: 'Create',
-          onPress: () => dbService.createNewEvent(posterURL, formData)
-        },
+          onPress: async () => {
+            const res = await dbService.createNewEvent(posterURL, formData);
+            if (res) {
+              Toast.show({
+                type: 'success',
+                text1: 'Event Created!'
+              });
+              formCleanUp();
+            }
+          },
+        }
       ]);
     }
 
-
   }
 
-  return (
-    <SafeAreaView className='flex-1 bg-white'>
+return (
+  <SafeAreaView className='flex-1 bg-white'>
 
-      <Appbar.Header statusBarHeight={0} className='bg-white'>
-        <Appbar.BackAction onPress={() => nvigation.pop()} />
-        <Appbar.Content title='Create new event' />
-      </Appbar.Header>
+    <Appbar.Header statusBarHeight={0} className='bg-white'>
+      <Appbar.BackAction onPress={() => nvigation.pop()} />
+      <Appbar.Content title='Create new event' />
+    </Appbar.Header>
 
-      <Divider />
+    <Divider />
 
-      <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} className='flex-1  '>
+    <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} className='flex-1  '>
 
-        <HelperText className='text-xl w-11/12 mx-auto'>Upload event poster</HelperText>
-        <View className='mt-1 w-11/12 h-1/4 rounded-md shadow-md shadow-black mx-auto mb-3'>
-          <Pressable onPress={pickImageAsync}>
-            <ImageViewer selectedImage={selectedImage} />
-          </Pressable>
-        </View>
+      <HelperText className='text-xl w-11/12 mx-auto'>Upload event poster</HelperText>
+      <View className='mt-1 w-11/12 h-1/4 rounded-md shadow-md shadow-black mx-auto mb-3'>
+        <Pressable onPress={pickImageAsync}>
+          <ImageViewer selectedImage={selectedImage} />
+        </Pressable>
+      </View>
 
-        <Divider className='mb-3' />
+      <Divider className='mb-3' />
 
-        <ScrollView keyboardShouldPersistTaps="handled" className='flex-1 '>
-          <View className=' mt-3 space-y-4 items-center'>
+      <ScrollView keyboardShouldPersistTaps="handled" className='flex-1 '>
+        <View className=' mt-3 space-y-4 items-center'>
 
-            <InputBox
-              name='event_name'
-              label='Event name'
-              placeholder='Event name'
-              icon='pencil'
-              control={control}
-              formErrors={errors}
-            />
+          <InputBox
+            name='event_name'
+            label='Event name'
+            placeholder='Event name'
+            icon='pencil'
+            control={control}
+            formErrors={errors}
+          />
 
-            <TextInput
-              className='w-11/12 mx-auto'
-              placeholder={'Event start'}
-              label={'Event start'}
-              editable={false}
-              mode='outlined'
-              value={dateTimeBeautify(eventStart)}
-              left={<TextInput.Icon icon='calendar-clock' onPress={() => showMode('date', setShowEventStart, setModeEventStart)} />}
-              right={<TextInput.Icon icon='clock-outline' onPress={() => showMode('time', setShowEventStart, setModeEventStart)} />}
-            />
+          <InputBox
+            name='event_venue'
+            label='Event venue'
+            placeholder='Event venue'
+            icon='map-marker'
+            control={control}
+            formErrors={errors}
+          />
 
-            {showEventStart && <DateTimePicker
-              value={eventStart}
-              mode={modeEventStart}
-              onChange={onChangeEventStart}
-            />}
+          <TextInput
+            className='w-11/12 mx-auto'
+            placeholder={'Event starts'}
+            label={'Event starts'}
+            editable={false}
+            mode='outlined'
+            value={dateTimeBeautify(eventStart)}
+            left={<TextInput.Icon icon='calendar-clock' onPress={() => showMode('date', setShowEventStart, setModeEventStart)} />}
+            right={<TextInput.Icon icon='clock-outline' onPress={() => showMode('time', setShowEventStart, setModeEventStart)} />}
+          />
 
-            <TextInput
-              className='w-11/12 mx-auto'
-              placeholder={'Event start'}
-              label={'Event ends'}
-              editable={false}
-              mode='outlined'
-              value={dateTimeBeautify(eventEnd)}
-              left={<TextInput.Icon icon='calendar-clock' onPress={() => showMode('date', setShowEventEnd, setModeEventEnd)} />}
-              right={<TextInput.Icon icon='clock-outline' onPress={() => showMode('time', setShowEventEnd, setModeEventEnd)} />}
-            />
+          {showEventStart && <DateTimePicker
+            value={eventStart}
+            mode={modeEventStart}
+            onChange={onChangeEventStart}
+          />}
 
-            {showEventEnd && <DateTimePicker
-              value={eventEnd}
-              mode={modeEventEnd}
-              onChange={onChangeEventEnd}
-            />}
+          <TextInput
+            className='w-11/12 mx-auto'
+            placeholder={'Event ends'}
+            label={'Event ends'}
+            editable={false}
+            mode='outlined'
+            value={dateTimeBeautify(eventEnd)}
+            left={<TextInput.Icon icon='calendar-clock' onPress={() => showMode('date', setShowEventEnd, setModeEventEnd)} />}
+            right={<TextInput.Icon icon='clock-outline' onPress={() => showMode('time', setShowEventEnd, setModeEventEnd)} />}
+          />
 
-            <TextInput
-              className='w-11/12 mx-auto'
-              placeholder={'Event start'}
-              label={'Event start'}
-              editable={false}
-              mode='outlined'
-              value={dateTimeBeautify(regBegin)}
-              left={<TextInput.Icon icon='calendar-clock' onPress={() => showMode('date', setShowRegBegin, setModRegBegin)} />}
-              right={<TextInput.Icon icon='clock-outline' onPress={() => showMode('time', setShowRegBegin, setModRegBegin)} />}
-            />
+          {showEventEnd && <DateTimePicker
+            value={eventEnd}
+            mode={modeEventEnd}
+            onChange={onChangeEventEnd}
+          />}
 
-            {showRegBegin && <DateTimePicker
-              value={regBegin}
-              mode={modRegBegin}
-              onChange={onChangeRegBegin}
-            />}
+          <TextInput
+            className='w-11/12 mx-auto'
+            placeholder={'Registration starts'}
+            label={'Registration starts'}
+            editable={false}
+            mode='outlined'
+            value={dateTimeBeautify(regBegin)}
+            left={<TextInput.Icon icon='calendar-clock' onPress={() => showMode('date', setShowRegBegin, setModRegBegin)} />}
+            right={<TextInput.Icon icon='clock-outline' onPress={() => showMode('time', setShowRegBegin, setModRegBegin)} />}
+          />
 
-            <TextInput
-              className='w-11/12 mx-auto'
-              placeholder={'Event start'}
-              label={'Event ends'}
-              editable={false}
-              mode='outlined'
-              value={dateTimeBeautify(regEnds)}
-              left={<TextInput.Icon icon='calendar-clock' onPress={() => showMode('date', setShowRegEnds, setModeRegEnds)} />}
-              right={<TextInput.Icon icon='clock-outline' onPress={() => showMode('time', setShowRegEnds, setModeRegEnds)} />}
-            />
+          {showRegBegin && <DateTimePicker
+            value={regBegin}
+            mode={modRegBegin}
+            onChange={onChangeRegBegin}
+          />}
 
-            {showRegEnds && <DateTimePicker
-              value={regEnds}
-              mode={modeRegEnds}
-              onChange={onChangeRegEnds}
-            />}
+          <TextInput
+            className='w-11/12 mx-auto'
+            placeholder={'Registration ends'}
+            label={'Registration ends'}
+            editable={false}
+            mode='outlined'
+            value={dateTimeBeautify(regEnds)}
+            left={<TextInput.Icon icon='calendar-clock' onPress={() => showMode('date', setShowRegEnds, setModeRegEnds)} />}
+            right={<TextInput.Icon icon='clock-outline' onPress={() => showMode('time', setShowRegEnds, setModeRegEnds)} />}
+          />
 
-            <InputBox
-              name='event_description'
-              label='Event description'
-              placeholder='Event description'
-              icon='calendar-text'
-              control={control}
-              formErrors={errors}
-              multiline={true}
-              numberOfLines={10}
-            />
+          {showRegEnds && <DateTimePicker
+            value={regEnds}
+            mode={modeRegEnds}
+            onChange={onChangeRegEnds}
+          />}
 
-            <View className=' flex flex-row items-center w-11/12 justify-between'>
-              <Text className='text-base'>Event scope</Text>
-              <RadioButton.Group onValueChange={newValue => setValue(newValue)} value={value}>
-                <View className=' w-11/12 flex flex-row items-center'>
-                  <Text className='text-slate-700'>University only</Text>
-                  <RadioButton value="uni_only" />
-                  <Text className='text-slate-700'>For everyone</Text>
-                  <RadioButton value="for_all" />
-                </View>
-              </RadioButton.Group>
-            </View>
+          <InputBox
+            name='event_description'
+            label='Event description'
+            placeholder='Event description'
+            icon='calendar-text'
+            control={control}
+            formErrors={errors}
+            multiline={true}
+            numberOfLines={10}
+          />
 
-            <View className='bg-red- flex flex-row w-11/12 items-center justify-between'>
-              <Text>Paid</Text>
-              <Switch value={isSwitchOn} onValueChange={onToggleSwitch} className='' />
-            </View>
-
-            <View className='w-11/12'>
-              <TextInput
-                name='event_description'
-                label='Enter amount'
-                placeholder='Enter amount'
-                mode='outlined'
-                value={eventPrice}
-                keyboardType="numeric"
-                className={`${!isSwitchOn && 'hidden'} flex-1`}
-                onChangeText={(txt) => { setEventPrice(txt) }}
-                left={<TextInput.Icon icon='currency-inr' />}
-              />
-            </View>
-
-            <Button
-              icon="plus-box"
-              mode="contained"
-              className="w-11/12 rounded-md mb-5"
-              onPress={handleSubmit(handleCreateEvent)}
-              disabled={isSubmitting}
-            >
-              Create event
-            </Button>
-
+          <View className=' flex flex-row items-center w-11/12 justify-between'>
+            <Text className='text-base'>Event scope</Text>
+            <RadioButton.Group onValueChange={newValue => setValue(newValue)} value={value}>
+              <View className=' w-11/12 flex flex-row items-center'>
+                <Text className='text-slate-700'>University only</Text>
+                <RadioButton value="uni_only" />
+                <Text className='text-slate-700'>For everyone</Text>
+                <RadioButton value="for_all" />
+              </View>
+            </RadioButton.Group>
           </View>
 
-        </ScrollView>
+          <View className='bg-red- flex flex-row w-11/12 items-center justify-between'>
+            <Text>Paid</Text>
+            <Switch value={isSwitchOn} onValueChange={onToggleSwitch} className='' />
+          </View>
 
-      </KeyboardAvoidingView>
-    </SafeAreaView>
-  )
+          <View className='w-11/12'>
+            <TextInput
+              name='event_description'
+              label='Enter amount'
+              placeholder='Enter amount'
+              mode='outlined'
+              value={eventPrice}
+              keyboardType="numeric"
+              className={`${!isSwitchOn && 'hidden'} flex-1`}
+              onChangeText={(txt) => { setEventPrice(txt) }}
+              left={<TextInput.Icon icon='currency-inr' />}
+            />
+          </View>
+
+          <Button
+            icon="plus-box"
+            mode="contained"
+            className="w-11/12 rounded-md mb-5"
+            onPress={handleSubmit(handleCreateEvent)}
+            disabled={isSubmitting}
+          >
+            Create event
+          </Button>
+
+        </View>
+
+      </ScrollView>
+
+    </KeyboardAvoidingView>
+  </SafeAreaView>
+)
 }
 
 export default AddNewEvent

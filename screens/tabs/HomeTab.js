@@ -8,7 +8,7 @@ import EventList from '../../components/EventsList';
 import TopTab from './TopTab';
 import { FlatList, Text, View } from 'react-native';
 import conf from '../../conf/conf';
-import { Button, Card, TextInput, Title } from 'react-native-paper';
+import { ActivityIndicator, Button, Card, TextInput, Title } from 'react-native-paper';
 import useRegisteredEvents from '../../context/registeredEventsContext';
 import { useNavigation } from '@react-navigation/native';
 import { UTC2date } from '../../utils/dateTimeFormat';
@@ -18,6 +18,7 @@ function Event() {
     const { events } = useRegisteredEvents();
 
     const [eventsList, setEventsList] = useState([]);
+    const [loading, setLoading] = useState(false);
 
     const fetchEvents = () => {
         console.log('😒😒😒😒😒😒😒😒');
@@ -29,7 +30,7 @@ function Event() {
             // const filteredListByUni = allevnts.filter(evnt => evnt.university_name.name === university);
             const filteredList = allevnts.filter(evt => !events.includes(evt.$id));
 
-            console.log(res);
+            // console.log(res);
             setEventsList(filteredList)
             // console.log(allevnts);
         });
@@ -43,26 +44,26 @@ function Event() {
         const unsubscribe = auth.client.subscribe(`databases.${conf.db_id}.collections.${conf.event_collection_id}.documents`, response => {
             // If new event created
             if (response.events.includes("databases.*.collections.*.documents.*.create")) {
-                if (response.payload.university_id === university_id) {
+                if (response.payload.university_id === university_id && response.payload.scope === "uni_only") {
                     setEventsList(prev => [response.payload, ...prev]);
                 }
             }
 
             // If event is deleted
             if (response.events.includes("databases.*.collections.*.documents.*.delete")) {
-                if (response.payload.university_id === university_id) {
+                if (response.payload.university_id === university_id && response.payload.scope === "uni_only") {
                     setEventsList(prev => prev.filter(evnt => evnt.$id !== response.payload.$id));
                 }
             }
 
             // If event is updated
             if (response.events.includes("databases.*.collections.*.documents.*.update")) {
-                if (response.payload.university_id === university_id) {
+                if (response.payload.university_id === university_id && response.payload.scope === "uni_only") {
                     setEventsList(prev => prev.filter(evnt => evnt.$id !== response.payload.$id));
                     setEventsList(prev => [response.payload, ...prev]);
                 }
             }
-            console.log(response);
+            // console.log(response);
         });
 
         // Closes the subscription.
@@ -70,6 +71,10 @@ function Event() {
             unsubscribe();
         }
     }, [events]);
+
+    if (loading) {
+        return <ActivityIndicator className='my-auto' />
+    }
 
     return (
         isOrganizer

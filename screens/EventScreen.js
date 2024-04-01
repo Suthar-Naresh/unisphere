@@ -11,8 +11,14 @@ import { useStripe } from '@stripe/stripe-react-native'
 import Loading from '../components/Loading'
 import dbService from '../appwrite/db'
 import useRegisteredEvents from '../context/registeredEventsContext'
+import { UTC2date, UTC2time } from '../utils/dateTimeFormat'
 
 const NUM_OF_LINES = 3;
+
+function beytifyDateTime(utcstring) {
+    const date = new Date(utcstring);
+    return `${date.toDateString()} | ${date.toLocaleTimeString()}`;
+}
 
 function EventScreen({ navigation, route }) {
 
@@ -28,7 +34,7 @@ function EventScreen({ navigation, route }) {
     const [alreadyRegistered, setAlreadyRegistered] = useState(false);
 
 
-    const { cardDetails: { $id, event_name, poster, price, organizer_name: { name: organizer }, event_description } } = route.params;
+    const { cardDetails: { $id, event_name, poster, price, venue, event_starts, event_ends, registration_start, registration_end, organizer_name: { name: organizer }, event_description } } = route.params;
 
     useEffect(() => {
         setFreeEvent(price === 0);
@@ -129,7 +135,6 @@ function EventScreen({ navigation, route }) {
 
 
                 <View>
-
                     {showMore ?
                         <ScrollView className='max-h-48 '>
                             <Text className=' text-justify' onTextLayout={handleTextLayout}>
@@ -149,29 +154,30 @@ function EventScreen({ navigation, route }) {
                             </Text>
                         </TouchableOpacity>
                     }
-
                 </View>
 
-
-                <View className='my-4 flex flex-row justify-between items-center'>
-                    <View className='space-x-8'>
-                        <TextInput.Icon icon='calendar' />
-                        <Text variant="titleLarge">{'24 Feb, 2024'}</Text>
+                <Text className='mt-4 underline font-semibold text-gray-700 text-md'>Registration details</Text>
+                <View className='mt-1 flex flex-row justify-between items-center'>
+                    <View className='space-x-8 '>
+                        <TextInput.Icon icon='calendar-clock-outline' className='mt-5' />
+                        <Text variant="titleLarge">{UTC2date(registration_start)} at {UTC2time(registration_start)}</Text>
+                        <Text variant="titleLarge">{UTC2date(registration_end)} at {UTC2time(registration_end)}</Text>
                     </View>
-                    <View className='space-x-8'>
-                        <TextInput.Icon icon='clock-time-three-outline' />
-                        <Text variant="titleLarge">{'03:01 PM - 01:30 AM'}</Text>
+                </View>
+
+                <Text className='mt-4 underline font-semibold text-gray-700 text-md'>Event details</Text>
+                <View className='mt-1 flex flex-row justify-between items-center'>
+                    <View className='space-x-8 '>
+                        <TextInput.Icon icon='calendar-clock-outline' className='mt-5' />
+                        <Text variant="titleLarge">{UTC2date(event_starts)} at {UTC2time(event_starts)}</Text>
+                        <Text variant="titleLarge">{UTC2date(event_ends)} at {UTC2time(event_ends)}</Text>
                     </View>
                 </View>
 
                 <View className='mt-4 space-y-4'>
                     <View className='space-x-8'>
-                        <TextInput.Icon icon='calendar-clock-outline' />
-                        <Text variant="titleLarge">{'25 Feb 2024 - 1 Mar 2024'}</Text>
-                    </View>
-                    <View className='space-x-8'>
                         <TextInput.Icon icon='map-marker-outline' />
-                        <Text variant="titleLarge">{'Main Building, Auditorium'}</Text>
+                        <Text variant="titleLarge">{venue}</Text>
                     </View>
                 </View>
 

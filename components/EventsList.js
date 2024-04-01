@@ -21,9 +21,9 @@ function EventsList({ data, buttonLabel }) {
                                 buttonLabel={buttonLabel}
                                 imageUrl={item.poster.toString()}
                                 title={item.event_name}
-                                date={UTC2date(item.date)}
+                                date={UTC2date(item.event_starts)}
                                 organizer={item.organizer_name.name}
-                                time={UTC2time(item.date)}
+                                time={UTC2time(item.event_starts)}
                                 price={item.price}
                                 description={item.event_description}
                                 onPress={() => navigation.navigate('event_screen', { cardDetails: item })} />

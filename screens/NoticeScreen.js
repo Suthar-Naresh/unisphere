@@ -2,7 +2,7 @@ import { Text, View } from 'react-native'
 import { Button, Divider, Appbar, TextInput } from 'react-native-paper'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { ScrollView } from 'react-native'
-import { UTC2date } from '../utils/dateTimeFormat'
+import { UTC2date, UTC2time } from '../utils/dateTimeFormat'
 
 function NoticeScreen({ navigation, route }) {
 
@@ -23,8 +23,15 @@ function NoticeScreen({ navigation, route }) {
                 <View className=' flex flex-row items-center justify-between'>
                     <Text className='font-semibold text-lg'>{name}</Text>
                     <View className='space-x-8'>
-                        <TextInput.Icon icon='calendar' />
+                        <TextInput.Icon icon='calendar-outline' />
                         <Text variant="titleLarge">{UTC2date(date)}</Text>
+                    </View>
+                </View>
+
+                <View className='flex flex-row justify-end mt-2'>
+                    <View className='space-x-8 float-right '>
+                        <TextInput.Icon icon='clock-outline' />
+                        <Text variant="titleLarge">{UTC2time(date)}</Text>
                     </View>
                 </View>
 

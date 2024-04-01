@@ -4,18 +4,6 @@ import { Text, View } from 'react-native'
 
 
 function EventCard({ title, organizer, price, description, date, time, imageUrl, onPress, buttonLabel }) {
-    // bucketService.getFilePreview('65f4770561d385014143').then(res => console.log(res)).catch(err => console.log(err.message))
-
-    // bucketService.getAllPosters().then(res=>{
-    //     res.files.forEach((file) => {
-    //         // Log file details
-    //         console.log('File ID:', file.$id);
-    //         console.log('File Name:', file.name);
-    //         console.log('File Size:', file.size);
-    //         console.log('File MIME Type:', file.mimeType);
-    //         console.log('---');
-    //       });
-    // }).catch(err=>console.log(err))
 
     return (
         <Card style={{ margin: 16 }} contentStyle={{ margin: 16 }}>

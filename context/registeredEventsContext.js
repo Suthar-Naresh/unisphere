@@ -15,7 +15,7 @@ export const RegisteredEventsProvider = ({ children }) => {
 
     useEffect(() => {
         dbService.getAllregisteredEvents(docID).then(res => {
-            // console.log('registered events::::',res);
+            console.log('registered events::::',res);
             const regEvnts = res.documents.map(evnts => evnts.event_id);
             setRegisteredEvents(regEvnts);
         }).catch(e => console.log(e))

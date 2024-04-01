@@ -37,6 +37,7 @@ export class DBService {
             return await this.databases.listDocuments(conf.db_id, conf.event_collection_id,
                 [
                     Query.equal("university_id", university_id),
+                    Query.equal("scope", "uni_only"),
                     Query.orderDesc("$createdAt")
                 ]
             );
@@ -116,7 +117,7 @@ export class DBService {
         }
     }
 
-    async createNewEvent(posterURL,eventData) {
+    async createNewEvent(posterURL, eventData) {
 
         /*
                 poster
@@ -130,6 +131,7 @@ export class DBService {
                 organizer_name(relation >=> docID)
                 event_starts
                 university_id
+                venue
         */
 
         try {
@@ -146,10 +148,53 @@ export class DBService {
                     organizer_name: eventData.organizer_name,
                     event_starts: eventData.event_starts,
                     university_id: eventData.university_id,
+                    venue: eventData.venue
                 }
             );
         } catch (error) {
             console.log("DBService::createEvent()::error", error.type);
+            console.log(error);
+            throw new Error(error.message);
+        }
+    }
+
+    async fetchExternalEvents() {
+        try {
+            return await this.databases.listDocuments(conf.db_id, conf.event_collection_id,
+                [
+                    Query.equal("scope", "for_all"),
+                    Query.orderDesc("$createdAt")
+                ]
+            );
+        } catch (error) {
+            console.log("DBService::fetchExternalEvents()::error", error.type);
+            console.log(error);
+            throw new Error(error.message);
+        }
+    }
+
+    async getEventsOfOrganizer(university_id, docID) {
+        try {
+            const list = await this.databases.listDocuments(conf.db_id, conf.event_collection_id,
+                [
+                    Query.equal("university_id", university_id),
+                    Query.orderDesc("$createdAt")
+                ]
+            );
+            return list.documents.filter(evnt => evnt.organizer_name.$id === docID);
+        } catch (error) {
+            console.log("DBService::getEventsOfOrganizer()::error", error.type);
+            console.log(error);
+            throw new Error(error.message);
+        }
+    }
+
+    async getStats() {
+        try {
+            const list = await this.databases.listDocuments(conf.db_id, conf.student_collection_id,);
+            return list.documents;
+        } catch (error) {
+            console.log("DBService::getStats()::error", error.type);
             console.log(error);
             throw new Error(error.message);
         }
