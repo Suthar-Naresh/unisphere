@@ -1,20 +1,19 @@
 import { Alert, Image, KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, View } from 'react-native'
-import { Appbar, Button, Dialog, Divider, HelperText, Portal, RadioButton, Switch, TextInput } from 'react-native-paper'
+import { Appbar, Button, Divider, HelperText, RadioButton, Switch, TextInput } from 'react-native-paper'
 import { SafeAreaView } from 'react-native-safe-area-context'
+import DateTimePicker from '@react-native-community/datetimepicker';
 import * as ImagePicker from 'expo-image-picker';
 
 // form imports
-import { Controller, useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { EventSchema } from '../utils/formSchema';
-import InputBox from '../components/InputBox';
 import { useState } from 'react';
-import DatePicker from '../components/DatePicker';
-import TimePicker from '../components/TimePicker';
-import bucketService from '../appwrite/bucket';
-import conf from '../conf/conf';
-import DateTimePicker from '../components/DateTimePicker';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useNavigation } from '@react-navigation/native';
+import InputBox from '../components/InputBox';
+import { EventSchema } from '../utils/formSchema';
+import useAppwrite from '../context/appwriteAuthContext';
+import dbService from "../appwrite/db"
+import bucketService from "../appwrite/bucket"
 
 function ImageViewer({ selectedImage }) {
   const imageSource = selectedImage ? { uri: selectedImage } : require('../assets/upload_event_poster.jpg');
@@ -24,17 +23,69 @@ function ImageViewer({ selectedImage }) {
   )
 }
 
-
 function AddNewEvent() {
-  const { control, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm({ resolver: zodResolver() });
+  const { control, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm({ resolver: zodResolver(EventSchema) });
+  const { user: { docID, university_id } } = useAppwrite();
   const nvigation = useNavigation();
 
   const [selectedImage, setSelectedImage] = useState(null);
   const [selectedImageFile, setSelectedImageFile] = useState(null);
   const [value, setValue] = useState('uni_only');
   const [isSwitchOn, setIsSwitchOn] = useState(false);
+  const [eventPrice, setEventPrice] = useState(null);
+  const [eventPriceError, setEventPriceError] = useState(''); // please fix me, when sitch is on and user doesn't provide the amount
 
   const onToggleSwitch = () => setIsSwitchOn(!isSwitchOn);
+
+  /* ---------------------- START OF DATE TIME PICKERS ----------------------------------- */
+  const [eventStart, setEventStart] = useState(new Date());
+  const [eventEnd, setEventEnd] = useState(new Date());
+  const [regBegin, setRegBegin] = useState(new Date());
+  const [regEnds, setRegEnds] = useState(new Date());
+
+  const [modeEventStart, setModeEventStart] = useState('date');
+  const [modeEventEnd, setModeEventEnd] = useState('date');
+  const [modRegBegin, setModRegBegin] = useState('date');
+  const [modeRegEnds, setModeRegEnds] = useState('date');
+
+  const [showEventStart, setShowEventStart] = useState(false);
+  const [showEventEnd, setShowEventEnd] = useState(false);
+  const [showRegBegin, setShowRegBegin] = useState(false);
+  const [showRegEnds, setShowRegEnds] = useState(false);
+
+  const showMode = (currentMode, setShow, setMode) => {
+    setShow(true);
+    setMode(currentMode);
+  };
+
+  const onChangeEventStart = (selectedDate) => {
+    const currentDate = new Date(selectedDate.nativeEvent.timestamp);
+    setShowEventStart(false);
+    setEventStart(currentDate);
+  };
+
+  const onChangeEventEnd = (selectedDate) => {
+    const currentDate = new Date(selectedDate.nativeEvent.timestamp);
+    setShowEventEnd(false);
+    setEventEnd(currentDate);
+  };
+
+  const onChangeRegBegin = (selectedDate) => {
+    const currentDate = new Date(selectedDate.nativeEvent.timestamp);
+    setShowRegBegin(false);
+    setRegBegin(currentDate);
+  };
+
+  const onChangeRegEnds = (selectedDate) => {
+    const currentDate = new Date(selectedDate.nativeEvent.timestamp);
+    setShowRegEnds(false);
+    setRegEnds(currentDate);
+  };
+  /* ---------------------- END OF DATE TIME PICKERS ----------------------------------- */
+
+  function dateTimeBeautify(dateTimeString) {
+    return `${dateTimeString.toDateString()}, ${dateTimeString.toLocaleTimeString()}`
+  }
 
   const pickImageAsync = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -51,11 +102,31 @@ function AddNewEvent() {
     }
   }
 
-  const handleCreateEvent = async () => {
+
+
+  const handleCreateEvent = async (eventFormData) => {
+
+    let posterURL = null;
+
+    const formData = {
+      price: isSwitchOn ? parseInt(eventPrice) : 0,
+      event_name: eventFormData.event_name,
+      event_description: eventFormData.event_description,
+      scope: value,
+      event_starts: eventStart.toISOString(),
+      event_ends: eventEnd.toISOString(),
+      registration_start: regBegin.toISOString(),
+      registration_end: regEnds.toISOString(),
+      organizer_name: docID,
+      university_id
+    }
 
     if (selectedImage && selectedImageFile) {
-      const posterURL = await bucketService.uploadEventPoster(selectedImage, selectedImageFile.mimeType);
+      posterURL = await bucketService.uploadEventPoster(selectedImage, selectedImageFile.mimeType);
       console.log(posterURL);
+      dbService.createNewEvent(posterURL, formData);
+      
+      
     } else {
       Alert.alert('No event poster!', 'You did not select any image. Therefore default event poster will be shown on this event. Do you want to create event?', [
         {
@@ -65,10 +136,11 @@ function AddNewEvent() {
         },
         {
           text: 'Create',
-          onPress: () => console.log('Event created!!')
+          onPress: () => dbService.createNewEvent(posterURL, formData)
         },
       ]);
     }
+
 
   }
 
@@ -105,10 +177,73 @@ function AddNewEvent() {
               formErrors={errors}
             />
 
-            <DateTimePicker placeholder='Event starts' />
-            <DateTimePicker placeholder='Event ends' />
-            <DateTimePicker placeholder='Registration starts' />
-            <DateTimePicker placeholder='Registration ends' />
+            <TextInput
+              className='w-11/12 mx-auto'
+              placeholder={'Event start'}
+              label={'Event start'}
+              editable={false}
+              mode='outlined'
+              value={dateTimeBeautify(eventStart)}
+              left={<TextInput.Icon icon='calendar-clock' onPress={() => showMode('date', setShowEventStart, setModeEventStart)} />}
+              right={<TextInput.Icon icon='clock-outline' onPress={() => showMode('time', setShowEventStart, setModeEventStart)} />}
+            />
+
+            {showEventStart && <DateTimePicker
+              value={eventStart}
+              mode={modeEventStart}
+              onChange={onChangeEventStart}
+            />}
+
+            <TextInput
+              className='w-11/12 mx-auto'
+              placeholder={'Event start'}
+              label={'Event ends'}
+              editable={false}
+              mode='outlined'
+              value={dateTimeBeautify(eventEnd)}
+              left={<TextInput.Icon icon='calendar-clock' onPress={() => showMode('date', setShowEventEnd, setModeEventEnd)} />}
+              right={<TextInput.Icon icon='clock-outline' onPress={() => showMode('time', setShowEventEnd, setModeEventEnd)} />}
+            />
+
+            {showEventEnd && <DateTimePicker
+              value={eventEnd}
+              mode={modeEventEnd}
+              onChange={onChangeEventEnd}
+            />}
+
+            <TextInput
+              className='w-11/12 mx-auto'
+              placeholder={'Event start'}
+              label={'Event start'}
+              editable={false}
+              mode='outlined'
+              value={dateTimeBeautify(regBegin)}
+              left={<TextInput.Icon icon='calendar-clock' onPress={() => showMode('date', setShowRegBegin, setModRegBegin)} />}
+              right={<TextInput.Icon icon='clock-outline' onPress={() => showMode('time', setShowRegBegin, setModRegBegin)} />}
+            />
+
+            {showRegBegin && <DateTimePicker
+              value={regBegin}
+              mode={modRegBegin}
+              onChange={onChangeRegBegin}
+            />}
+
+            <TextInput
+              className='w-11/12 mx-auto'
+              placeholder={'Event start'}
+              label={'Event ends'}
+              editable={false}
+              mode='outlined'
+              value={dateTimeBeautify(regEnds)}
+              left={<TextInput.Icon icon='calendar-clock' onPress={() => showMode('date', setShowRegEnds, setModeRegEnds)} />}
+              right={<TextInput.Icon icon='clock-outline' onPress={() => showMode('time', setShowRegEnds, setModeRegEnds)} />}
+            />
+
+            {showRegEnds && <DateTimePicker
+              value={regEnds}
+              mode={modeRegEnds}
+              onChange={onChangeRegEnds}
+            />}
 
             <InputBox
               name='event_description'
@@ -138,23 +273,26 @@ function AddNewEvent() {
               <Switch value={isSwitchOn} onValueChange={onToggleSwitch} className='' />
             </View>
 
-            <InputBox
-              name='event_description'
-              label='Enter amount'
-              placeholder='Enter amount'
-              icon='currency-inr'
-              keyboardType="numeric"
-              className={`${!isSwitchOn && 'hidden'} flex-1`}
-              control={control}
-              formErrors={errors}
-            />
+            <View className='w-11/12'>
+              <TextInput
+                name='event_description'
+                label='Enter amount'
+                placeholder='Enter amount'
+                mode='outlined'
+                value={eventPrice}
+                keyboardType="numeric"
+                className={`${!isSwitchOn && 'hidden'} flex-1`}
+                onChangeText={(txt) => { setEventPrice(txt) }}
+                left={<TextInput.Icon icon='currency-inr' />}
+              />
+            </View>
 
             <Button
               icon="plus-box"
               mode="contained"
               className="w-11/12 rounded-md mb-5"
-              onPress={(handleCreateEvent)}
-            // disabled={isSubmitting}
+              onPress={handleSubmit(handleCreateEvent)}
+              disabled={isSubmitting}
             >
               Create event
             </Button>

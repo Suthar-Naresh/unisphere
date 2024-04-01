@@ -2,10 +2,10 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 import MainScreen from "../screens/MainScreen"
 import EventScreen from "../screens/EventScreen"
-import AddNewEvent from "../screens/AddNewEvent";
 import AddAnoucement from "../screens/AddAnoucement";
-import { RegisteredEventsProvider } from "../context/registeredEventsContext";
 import NoticeScreen from "../screens/NoticeScreen";
+import AddNewEvent from "../screens/AddNewEvent";
+import { RegisteredEventsProvider } from "../context/registeredEventsContext";
 
 const Stack = createNativeStackNavigator();
 

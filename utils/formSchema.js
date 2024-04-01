@@ -17,16 +17,8 @@ const signUpSchema = z.object({
 });
 
 const EventSchema = z.object({
-  event_poster: z.string().url(),
   event_name: z.string().min(1).max(255),
-  event_starts: z.date(),
-  event_ends: z.date(),
-  event_start_registration: z.date(),
-  event_end_registration: z.date(),
   event_description: z.string().min(1).max(2048),
-  event_scope: z.enum(["uni_only", "for_all"]),
-  event_price: z.number().int('Price should be in integers only.').min(10, 'Ticket price should be at least ₹10.'),
-  event_organizer: z.string().min(1).max(255),
 });
 
 const AnnouncementSchema = z.object({

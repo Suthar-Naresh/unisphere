@@ -1,7 +1,6 @@
 import { Alert, Image, KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, View } from 'react-native'
 import { Appbar, Button, Dialog, Divider, HelperText, Portal, RadioButton, Switch, TextInput } from 'react-native-paper'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import * as ImagePicker from 'expo-image-picker';
 
 // form imports
 import { useForm } from 'react-hook-form';

@@ -37,7 +37,8 @@
     "react-native-vector-icons": "^10.0.3",
     "zod": "^3.22.4",
     "expo-image-picker": "~14.7.1",
-    "expo-file-system": "~16.0.8"
+    "expo-file-system": "~16.0.8",
+    "@react-native-community/datetimepicker": "7.6.1"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

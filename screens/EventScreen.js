@@ -90,7 +90,6 @@ function EventScreen({ navigation, route }) {
     }
 
     const handleFreeEvent = async () => {
-        console.log('➡️➡️➡️',docID);
         dbService.registerStudentInEvent(docID, $id).then(res => {
             if (res) {
                 Toast.show({
