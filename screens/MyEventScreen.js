@@ -70,6 +70,8 @@ function MyEventScreen({ navigation, route }) {
         setShowMore((pv) => !pv);
     };
 
+    const scanQR = () => navigation.navigate("scan_ticket_screen", { event_name });
+
 
     return (
         <SafeAreaView className='bg-white flex-1'>
@@ -176,14 +178,20 @@ function MyEventScreen({ navigation, route }) {
                             </>
                     }
                     <View className=' flex-1'>
-                        <View className=' flex-1'>
-                            <Button
-                                mode='contained'
-                                className='absolute bottom-0 w-full rounded-md'
-                                onPress={isOrganizer ? showStat : showQR}
-                            >
-                                {isOrganizer ? 'Stats' : 'Show ticket'}
-                            </Button>
+                        <View className='flex-1'>
+                            <View className='flex flex-row space-x-3 absolute bottom-0'>
+
+                                {isOrganizer && <Button onPress={scanQR} icon='qrcode-scan' mode='contained' className=' rounded-md'>Scan</Button>}
+
+                                <Button
+                                    mode='contained'
+                                    className='rounded-md flex-1'
+                                    onPress={isOrganizer ? showStat : showQR}
+                                >
+                                    {isOrganizer ? 'Stats' : 'Show ticket'}
+                                </Button>
+                            </View>
+
                         </View>
                     </View>
                 </View>

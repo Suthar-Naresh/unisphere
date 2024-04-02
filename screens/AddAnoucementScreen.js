@@ -12,7 +12,7 @@ import dbService from '../appwrite/db';
 import useAppwrite from '../context/appwriteAuthContext';
 import Toast from 'react-native-toast-message';
 
-function AddAnoucement() {
+function AddAnoucementScreen() {
     const { control, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm({ resolver: zodResolver(AnnouncementSchema) });
     const { user: { docID, university_id } } = useAppwrite();
 
@@ -93,4 +93,4 @@ function AddAnoucement() {
     )
 }
 
-export default AddAnoucement
+export default AddAnoucementScreen

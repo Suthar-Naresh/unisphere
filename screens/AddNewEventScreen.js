@@ -24,7 +24,7 @@ function ImageViewer({ selectedImage }) {
   )
 }
 
-function AddNewEvent() {
+function AddNewEventScreen() {
   const { control, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm({ resolver: zodResolver(EventSchema) });
   const { user: { docID, university_id } } = useAppwrite();
   const nvigation = useNavigation();
@@ -344,4 +344,4 @@ return (
 )
 }
 
-export default AddNewEvent
+export default AddNewEventScreen

@@ -7,6 +7,8 @@ export default function Ticket() {
   const [hasPermission, setHasPermission] = useState(null);
   const [scanned, setScanned] = useState(false);
 
+  const [scanData, setScanData] = useState();
+
   useEffect(() => {
     const getCameraPermissions = async () => {
       const { status } = await Camera.requestCameraPermissionsAsync();
@@ -19,6 +21,7 @@ export default function Ticket() {
   const handleBarCodeScanned = ({ type, data }) => {
     setScanned(true);
     alert(`Bar code with type ${type} and data ${data} has been scanned!`);
+    setScanData(data);
   };
 
   if (hasPermission === null) {
@@ -38,8 +41,10 @@ export default function Ticket() {
         style={StyleSheet.absoluteFillObject}
       />
       {scanned && (
-        <Button title={"Tap to Scan Again"} onPress={() => setScanned(false)} />
+        <Button title="Tap to Scan Again" onPress={() => setScanned(false)} />
       )}
+
+      <Text>{scanData}</Text>
     </View>
   );
 }
