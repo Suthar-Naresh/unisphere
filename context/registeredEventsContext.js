@@ -21,7 +21,6 @@ export const RegisteredEventsProvider = ({ children }) => {
         }).catch(e => console.log(e))
     }, [])
 
-
     const value = {
         events: registeredEvents,
         setRegisteredEvents

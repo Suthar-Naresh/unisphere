@@ -47,6 +47,23 @@ export class DBService {
         }
     }
 
+    async allEvents2(university_id, events) {
+        try {
+            const list = await this.databases.listDocuments(conf.db_id, conf.event_collection_id,
+                [
+                    Query.equal("university_id", university_id),
+                    Query.equal("scope", "uni_only"),
+                    Query.orderDesc("$createdAt")
+                ]
+            );
+
+            return list.documents.filter(evt => !events.includes(evt.$id));
+        } catch (error) {
+            console.log(error);
+            throw new Error("DBService::allEvents2()::error", error);
+        }
+    }
+
     async registerStudentInEvent(studentId, eventId) {
         try {
             return await this.databases.createDocument(conf.db_id, conf.event_attend_collection_id, ID.unique(), { student_id: studentId, event_id: eventId });
@@ -195,6 +212,23 @@ export class DBService {
             return list.documents;
         } catch (error) {
             console.log("DBService::getStats()::error", error.type);
+            console.log(error);
+            throw new Error(error.message);
+        }
+    }
+
+    async checkIfUserRegistered(student_id, event_id) {
+        try {
+            const list = await this.databases.listDocuments(conf.db_id, conf.event_attend_collection_id,
+                [
+                    Query.equal("event_id", event_id),
+                    Query.equal("student_id", student_id)
+                ]
+            );
+
+            return list.total;
+        } catch (error) {
+            console.log("DBService::checkIfUserRegistered()::error", error.type);
             console.log(error);
             throw new Error(error.message);
         }

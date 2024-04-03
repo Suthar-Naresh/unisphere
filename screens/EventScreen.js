@@ -33,7 +33,6 @@ function EventScreen({ navigation, route }) {
 
     const [alreadyRegistered, setAlreadyRegistered] = useState(false);
 
-
     const { cardDetails: { $id, event_name, poster, price, venue, event_starts, event_ends, registration_start, registration_end, organizer_name: { name: organizer }, event_description } } = route.params;
 
     useEffect(() => {

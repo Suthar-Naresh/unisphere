@@ -4,11 +4,6 @@ import { Button, Divider, Appbar, TextInput, Icon, ActivityIndicator, Portal, Di
 import { SafeAreaView } from 'react-native-safe-area-context'
 import useAppwrite from '../context/appwriteAuthContext'
 import { ScrollView } from 'react-native'
-import Toast from 'react-native-toast-message'
-import PaymentButton, { AlreadyRegisteredButton } from '../components/PaymentButton'
-import functionService from '../appwrite/functions'
-import { useStripe } from '@stripe/stripe-react-native'
-import Loading from '../components/Loading'
 import dbService from '../appwrite/db'
 import useRegisteredEvents from '../context/registeredEventsContext'
 import { UTC2date, UTC2time } from '../utils/dateTimeFormat'
@@ -35,7 +30,6 @@ function MyEventScreen({ navigation, route }) {
     const hideQR = () => setQrVisible(false);
 
 
-    const [alreadyRegistered, setAlreadyRegistered] = useState(false);
     const [visible, setVisible] = useState(false);
 
     const showStat = () => setVisible(true);
@@ -45,6 +39,11 @@ function MyEventScreen({ navigation, route }) {
     const [statData, setStatData] = useState([]);
 
     const { cardDetails: { $id, event_name, poster, price, venue, event_starts, event_ends, registration_start, registration_end, organizer_name: { name: organizer }, event_description } } = route.params;
+
+    const qrData = {
+        student_id: docID,
+        event_id: $id
+    }
 
     useEffect(() => {
         // generate qr data...
@@ -70,8 +69,7 @@ function MyEventScreen({ navigation, route }) {
         setShowMore((pv) => !pv);
     };
 
-    const scanQR = () => navigation.navigate("scan_ticket_screen", { event_name });
-
+    const scanQR = () => navigation.navigate("scan_ticket_screen", { event_name, $id });
 
     return (
         <SafeAreaView className='bg-white flex-1'>
@@ -166,11 +164,7 @@ function MyEventScreen({ navigation, route }) {
                                         <Dialog.Icon icon="ticket-confirmation-outline" size={70} />
                                         <Dialog.Content className='bg-red- mx-auto'>
                                             <View className='bg-white p-5 border-2 border-dotted '>
-                                                <QRCode size={200} value={JSON.stringify({
-                                                    name: 'some random name',
-                                                    txnid: 'bwhjdbchawdghcwjd',
-                                                    eventid: 'hhjhjdvhgsadhasdchaj'
-                                                })} />
+                                                <QRCode size={200} value={JSON.stringify(qrData)} />
                                             </View>
                                         </Dialog.Content>
                                     </Dialog>

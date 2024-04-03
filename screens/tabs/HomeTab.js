@@ -24,22 +24,28 @@ function Event() {
         console.log('😒😒😒😒😒😒😒😒');
         setIsLoading(true);
 
-        dbService.allEvents(university_id).then((res) => {
+        dbService.allEvents2(university_id, events).then((res) => {
 
-            const allevnts = res.documents;
-            // const filteredListByUni = allevnts.filter(evnt => evnt.university_name.name === university);
-            const filteredList = allevnts.filter(evt => !events.includes(evt.$id));
+            /*
+                const allevnts = res.documents;
+                // const filteredListByUni = allevnts.filter(evnt => evnt.university_name.name === university);
+                const filteredList = allevnts.filter(evt => !events.includes(evt.$id));
 
-            // console.log(res);
-            setEventsList(filteredList)
-            // console.log(allevnts);
+                // console.log(res);
+                setEventsList(filteredList)
+                // console.log(allevnts);
+            */
+
+            setEventsList(res)
         });
 
         setIsLoading(false);
     }
 
     useEffect(() => {
+        setLoading(true);
         fetchEvents();
+        setLoading(false);
 
         const unsubscribe = auth.client.subscribe(`databases.${conf.db_id}.collections.${conf.event_collection_id}.documents`, response => {
             // If new event created
@@ -90,7 +96,7 @@ function NoticeCard({ onPress, title, description, organizer, noticeDate }) {
     return (
         <Card style={{ margin: 16 }} contentStyle={{ margin: 16 }}>
             <View className='flex flex-row justify-between items-center'>
-                <Title className='font-bold text-xl'>{title}</Title>
+                <Title className='font-bold text-xl truncate'>{title}</Title>
             </View>
 
             <Card.Content className='space-y-3'>

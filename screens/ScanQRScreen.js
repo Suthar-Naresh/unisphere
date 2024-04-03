@@ -2,10 +2,11 @@ import { useState, useEffect } from "react";
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { CameraView, Camera } from "expo-camera/next";
 import { Appbar, Button, Divider, Text } from "react-native-paper";
-import { Dimensions, StyleSheet, View } from "react-native";
+import { Alert, Dimensions, StyleSheet, View } from "react-native";
+import dbService from "../appwrite/db";
 
 function ScanQRScreen({ route, navigation }) {
-    const { event_name } = route.params;
+    const { event_name, $id } = route.params;
 
     const [hasPermission, setHasPermission] = useState(null);
     const [scanned, setScanned] = useState(false);
@@ -21,9 +22,28 @@ function ScanQRScreen({ route, navigation }) {
         getCameraPermissions();
     }, []);
 
-    const handleBarCodeScanned = ({ type, data }) => {
+    const handleBarCodeScanned = async ({ type, data }) => {
         setScanned(true);
-        alert(`Bar code with type ${type} and data ${data} has been scanned!`);
+        // alert(`Bar code with type ${type} and data ${data} has been scanned!`);
+        const qrData = JSON.parse(data);
+        // console.log(data);
+
+        // console.log('data id>>>>>',typeof qrData.event_id);
+        // console.log('event id>>>>>',typeof $id);
+
+        if (qrData.event_id === $id) {
+            // check if user has registered
+            const res = await dbService.checkIfUserRegistered(qrData.student_id, qrData.event_id);
+            if (res === 1) {
+                Alert.alert('Ticket scanned', 'Welcome to event!');
+            } else {
+                Alert.alert('Ticket scanned', 'Ticket doesn\'t belongs to this event.');
+            }
+
+        } else {
+            Alert.alert('Ticket scanned', `You are scanning for "${event_name}" event.\nBut this ticket belongs to some other event.`);
+        }
+
         setScanData(data);
     };
 
@@ -58,7 +78,7 @@ function ScanQRScreen({ route, navigation }) {
                     <Text className='text-white text-xl'>{event_name}</Text>
                     <View style={{ width: width / 2, height: width / 2, borderRadius: 8, borderColor: 'white', borderWidth: 2 }}></View>
                     {scanned && (
-                        <Button mode="outlined" labelStyle={{color:'white',fontSize:16}} className='text-white' onPress={() => setScanned(false)} >
+                        <Button mode="outlined" labelStyle={{ color: 'white', fontSize: 16 }} className='text-white' onPress={() => setScanned(false)} >
                             SCAN AGAIN
                         </Button>
                     )}
