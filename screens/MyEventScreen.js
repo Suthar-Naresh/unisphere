@@ -47,8 +47,8 @@ function MyEventScreen({ navigation, route }) {
 
     useEffect(() => {
         // generate qr data...
-        dbService.getStats().then(res => {
-            console.log(res);
+        dbService.getStats($id).then(res => {
+            // console.log('🧾🧾🧾🧾',res);
             const dataForStats = res.map(st => ({
                 key: st.$id,
                 name: st.name,

@@ -206,10 +206,32 @@ export class DBService {
         }
     }
 
-    async getStats() {
+    async getStats(event_id) {
         try {
-            const list = await this.databases.listDocuments(conf.db_id, conf.student_collection_id,);
-            return list.documents;
+            const list = await this.databases.listDocuments(conf.db_id, conf.event_attend_collection_id,
+                [
+                    Query.equal("event_id", event_id)
+                ]
+            );
+            const students = list.documents.map(st => st.student_id);
+
+            if (students.length > 0) {
+                // fetch student details
+                try {
+                    const res = await this.databases.listDocuments(conf.db_id, conf.student_collection_id,
+                        [
+                            Query.equal("$id",students)
+                        ]
+                    );
+                    return res.documents;
+                } catch (error) {
+                    console.log("DBService::getStats()::fetching students::error", error.type);
+                    console.log(error);
+                    throw new Error(error.message);
+                }
+            }else{
+                return [];
+            }
         } catch (error) {
             console.log("DBService::getStats()::error", error.type);
             console.log(error);
