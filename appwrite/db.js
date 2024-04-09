@@ -220,7 +220,7 @@ export class DBService {
                 try {
                     const res = await this.databases.listDocuments(conf.db_id, conf.student_collection_id,
                         [
-                            Query.equal("$id",students)
+                            Query.equal("$id", students)
                         ]
                     );
                     return res.documents;
@@ -229,7 +229,7 @@ export class DBService {
                     console.log(error);
                     throw new Error(error.message);
                 }
-            }else{
+            } else {
                 return [];
             }
         } catch (error) {
@@ -251,6 +251,17 @@ export class DBService {
             return list.total;
         } catch (error) {
             console.log("DBService::checkIfUserRegistered()::error", error.type);
+            console.log(error);
+            throw new Error(error.message);
+        }
+    }
+
+    async uniSubscribed(university_id) {
+        try {
+            const { subscribed } = await this.databases.getDocument(conf.db_id, conf.university_collection_id, university_id);
+            return subscribed;
+        } catch (error) {
+            console.log("DBService::uniSubscribed()::error", error.type);
             console.log(error);
             throw new Error(error.message);
         }

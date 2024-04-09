@@ -35,7 +35,7 @@ function AppBarWithDialog() {
                         <Text variant="bodyMedium">Name : {name}</Text>
                         <Text variant="bodyMedium">Email : {email}</Text>
                         <Text variant="bodyMedium">University : {university}</Text>
-                        <Text variant="bodyMedium">Organizer : {isOrganizer ? 'YES' : 'NO'}</Text>
+                        {/* <Text variant="bodyMedium">Organizer : {isOrganizer ? 'YES' : 'NO'}</Text> */}
                         <Text variant="bodyMedium"></Text>
                         <Button icon="logout" className='rounded-md bg-red-500' mode="contained" onPress={handleLogout}>
                             Logout

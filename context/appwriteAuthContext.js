@@ -4,6 +4,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import Loading from "../components/Loading";
 import teamService from "../appwrite/team";
 import conf from "../conf/conf";
+import dbService from "../appwrite/db";
 
 const INIT_USER = {
     id: "",
@@ -12,7 +13,8 @@ const INIT_USER = {
     university: "",
     university_id: "",
     docID: "",
-    isOrganizer: false
+    isOrganizer: false,
+    uniSubscribed: false,
 };
 
 const INIT_STATE = {
@@ -48,6 +50,10 @@ export const AppwriteProvider = ({ children }) => {
             // array.some(num => num % 2 === 0)
             // console.log(teams);
 
+            // console.log('🍜🍜', sessionInfo.prefs.university_id);
+
+            const uniSubscribed = await dbService.uniSubscribed(sessionInfo.prefs.university_id);
+
             // Set the user context using session info
             setUser({
                 id: sessionInfo.$id,
@@ -56,7 +62,8 @@ export const AppwriteProvider = ({ children }) => {
                 university: university || 'Man i do\'n go to college',
                 university_id: university_id,
                 isOrganizer: isOrganizer,
-                docID
+                docID,
+                uniSubscribed: uniSubscribed
             });
 
         } else {

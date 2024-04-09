@@ -8,10 +8,18 @@ import AddNewEventScreen from "../screens/AddNewEventScreen";
 import { RegisteredEventsProvider } from "../context/registeredEventsContext";
 import MyEventScreen from "../screens/MyEventScreen";
 import ScanQRScreen from "../screens/ScanQRScreen";
+import useAppwrite from "../context/appwriteAuthContext";
+import BuySubscription from "../screens/BuySubscription";
 
 const Stack = createNativeStackNavigator();
 
 const AppStack = () => {
+    const { user: { uniSubscribed,university } } = useAppwrite();
+
+    if (!uniSubscribed) {
+        return <BuySubscription university={university} />
+    }
+
     return (
         <RegisteredEventsProvider>
             <Stack.Navigator
