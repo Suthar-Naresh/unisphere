@@ -1,4 +1,4 @@
-const stripe = require("stripe")("sk_test_51Ow93mSGAmc9SzQrE5Q69HNgjBcs5rgY2542F4B3pa0ciWVqpvKCW1uI3B3EhYiMo5BMPc3oH05hzElr2dx1vJTC00AimKRA39");
+const stripe = require("stripe")(process.env.FUNCTION_STRIPE_KEY);
 
 module.exports = async function ({ req, res, log, error }) {
     if (req.method === 'POST') {
