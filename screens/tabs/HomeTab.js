@@ -12,6 +12,7 @@ import { ActivityIndicator, Button, Card, TextInput, Title } from 'react-native-
 import useRegisteredEvents from '../../context/registeredEventsContext';
 import { useNavigation } from '@react-navigation/native';
 import { UTC2date } from '../../utils/dateTimeFormat';
+import OrganizerEventsList from '../../components/OrganizerEventList';
 
 function Event() {
     const { auth, setIsLoading, user: { isOrganizer, university_id } } = useAppwrite();
@@ -85,7 +86,7 @@ function Event() {
     return (
         isOrganizer
             ?
-            <EventList data={eventsList} buttonLabel='Read More' />
+            <OrganizerEventsList data={eventsList} buttonLabel='Read More' />
             :
             <EventList data={eventsList} buttonLabel='Book Now' />
     )

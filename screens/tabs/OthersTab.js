@@ -8,16 +8,7 @@ import dbService from '../../appwrite/db';
 import conf from '../../conf/conf';
 import EventCard from '../../components/EventCard';
 import { UTC2date, UTC2time } from '../../utils/dateTimeFormat';
-
-async function fetcher() {
-    try {
-        const response = await fetch('192.168.20.51:8000/check?name=demo&university=ss&email=koko'); // Replace with your server URL
-        const data = await response.json();
-        console.log(data);
-    } catch (error) {
-        console.error('Error fetching users:', error);
-    }
-}
+import OrganizerEventCard from '../../components/OrganizerEventCard';
 
 function OthersTab({ navigation }) {
 
@@ -101,7 +92,7 @@ function OthersTab({ navigation }) {
                                 keyExtractor={(item, index) => item.$id}
                                 data={externalEvente}
                                 renderItem={({ item }) => (
-                                    <EventCard
+                                    <OrganizerEventCard
                                         buttonLabel={isOrganizer ? 'Read More' : 'Book Now'}
                                         imageUrl={item.poster.toString()}
                                         title={item.event_name}

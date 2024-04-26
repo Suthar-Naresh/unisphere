@@ -54,6 +54,8 @@ function MyEventScreen({ navigation, route }) {
                 name: st.name,
                 email: st.email,
                 university: st.university,
+                roll: st.roll,
+                contact: st.contact,
             }));
 
             setStatData(dataForStats);

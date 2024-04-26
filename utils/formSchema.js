@@ -6,7 +6,7 @@ const loginSchema = z.object({
 });
 
 const signUpSchema = z.object({
-  signup_name: z.string().min(2),
+  signup_mobile: z.string().regex(/^[1-9]{1}[0-9]{9}$/,'Invalid mobile number. Enter 10 digit mobile number.'),
   signup_email: z.string().email(),
   signup_password: z.string().min(8, 'Password must contain at least 8 characters'),
   signup_retypePassword: z.string(),

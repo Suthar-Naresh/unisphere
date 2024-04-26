@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Alert } from 'react-native';
 import { DataTable, IconButton } from 'react-native-paper';
 
 const DataTableForStat = ({ dataForTable }) => {
@@ -26,19 +27,32 @@ const DataTableForStat = ({ dataForTable }) => {
     setPage(0);
   }, [itemsPerPage]);
 
+  const showDataOnTap = (item) => {
+    const cnt = `
+    👤 : ${item.name}\n
+    🪪 : ${item.roll}\n
+    📱 : ${item.contact}\n
+    🎓 : ${item.university}\n
+    📩 : ${item.email}
+    `;
+    Alert.alert('Student details',cnt)
+  }
+
   return (
     <DataTable>
       <DataTable.Header>
         <DataTable.Title>Name</DataTable.Title>
-        <DataTable.Title>Email</DataTable.Title>
         <DataTable.Title>University</DataTable.Title>
+        <DataTable.Title>Mobile</DataTable.Title>
+        <DataTable.Title>Roll number</DataTable.Title>
       </DataTable.Header>
 
       {items.slice(from, to).map((item) => (
-        <DataTable.Row key={item.key} onPress={() => alert(`Name:${item.name}\nUniversity:${item.university}\nEmail:${item.email}`)}>
+        <DataTable.Row key={item.key} onPress={()=>showDataOnTap(item)}>
           <DataTable.Cell>{item.name}</DataTable.Cell>
-          <DataTable.Cell>{item.email}</DataTable.Cell>
           <DataTable.Cell>{item.university}</DataTable.Cell>
+          <DataTable.Cell>{item.contact}</DataTable.Cell>
+          <DataTable.Cell>{item.roll}</DataTable.Cell>
           {/* <DataTable.Cell numeric>
             <IconButton
               icon="eye-outline"

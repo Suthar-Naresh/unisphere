@@ -42,7 +42,8 @@ export const AppwriteProvider = ({ children }) => {
             console.log('User is already logged in');
 
             // check for user pref for university
-            const { university, university_id, docID } = await auth.getUserPrefInfo();
+            // const { university, university_id, docId } = await auth.getUserPrefInfo();
+            const { university, university_id, docID } = sessionInfo.prefs;
 
             // check if user is part of organization team
             const teams = await teamService.getTeamsOfUser();
@@ -50,7 +51,7 @@ export const AppwriteProvider = ({ children }) => {
             // array.some(num => num % 2 === 0)
             // console.log(teams);
 
-            // console.log('🍜🍜', sessionInfo.prefs.university_id);
+            // console.log('🍜🍜', docID);
 
             const uniSubscribed = await dbService.uniSubscribed(sessionInfo.prefs.university_id);
 
@@ -62,7 +63,7 @@ export const AppwriteProvider = ({ children }) => {
                 university: university || 'Man i do\'n go to college',
                 university_id: university_id,
                 isOrganizer: isOrganizer,
-                docID,
+                docID: docID,
                 uniSubscribed: uniSubscribed
             });
 

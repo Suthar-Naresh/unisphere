@@ -25,7 +25,7 @@ function ImageViewer({ selectedImage }) {
 }
 
 function AddNewEventScreen() {
-  const { control, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm({ resolver: zodResolver(EventSchema) });
+  const { control, handleSubmit, reset, formState: { errors } } = useForm({ resolver: zodResolver(EventSchema) });
   const { user: { docID, university_id } } = useAppwrite();
   const nvigation = useNavigation();
 
@@ -37,6 +37,8 @@ function AddNewEventScreen() {
   const [eventPriceError, setEventPriceError] = useState(''); // please fix me, when sitch is on and user doesn't provide the amount
 
   const onToggleSwitch = () => setIsSwitchOn(!isSwitchOn);
+
+  const [formSubmitting, setFormSubmitting] = useState(false);
 
   /* ---------------------- START OF DATE TIME PICKERS ----------------------------------- */
   const [eventStart, setEventStart] = useState(new Date());
@@ -115,6 +117,8 @@ function AddNewEventScreen() {
     setValue('uni_only');
     setIsSwitchOn(false);
     setEventPrice(null);
+
+    setFormSubmitting(false);
   }
 
   const handleCreateEvent = async (eventFormData) => {
@@ -136,6 +140,8 @@ function AddNewEventScreen() {
     }
 
     if (selectedImage && selectedImageFile) {
+      setFormSubmitting(true);
+
       posterURL = await bucketService.uploadEventPoster(selectedImage, selectedImageFile.mimeType);
       console.log(posterURL);
       const res = await dbService.createNewEvent(posterURL, formData);
@@ -158,6 +164,8 @@ function AddNewEventScreen() {
         {
           text: 'Create',
           onPress: async () => {
+            setFormSubmitting(true);
+            
             const res = await dbService.createNewEvent(posterURL, formData);
             if (res) {
               Toast.show({
@@ -330,7 +338,7 @@ function AddNewEventScreen() {
               mode="contained"
               className="w-11/12 rounded-md mb-5"
               onPress={handleSubmit(handleCreateEvent)}
-              disabled={isSubmitting}
+              disabled={formSubmitting}
             >
               Create event
             </Button>

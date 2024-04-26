@@ -18,6 +18,42 @@ import useAppwrite from '../context/appwriteAuthContext';
 import Dropdown from '../components/DropDownList';
 import InputBox from '../components/InputBox';
 
+
+// Check function
+const checkStudent = async (email, contact, university) => {
+    try {
+        const postData = {
+            "email": email,
+            "contact": contact,
+            "university": university
+        }
+
+        const res = await fetch('http://192.168.38.51:3000/api/check', {
+            method: 'POST',
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(postData),
+        });
+
+        const data = await res.json();
+
+        if (data.status === 'ok') {
+            return data.data;
+        } else {
+            Toast.show({
+                type: 'error',
+                text1: 'Student with provided details does not exist.'
+            });
+            return null;
+        }
+
+    } catch (error) {
+        console.log('💣💣', error);
+    }
+}
+
 function SignUpScreen({ navigation }) {
     const { control, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm({ resolver: zodResolver(signUpSchema) });
     const { auth, setIsLoggedIn, setIsLoading, setSessionDetails } = useAppwrite();
@@ -27,10 +63,13 @@ function SignUpScreen({ navigation }) {
 
     useEffect(() => {
         dbService.getUniversities().then((res) => {
-            const x = res.documents.map(({ name, $id }) => ({ name, id: $id }));
+            const x = res.documents.map(({ name, $id, checkURL }) => ({ name, id: $id, checkURL }));
             // console.log(x);
 
-            setUniversityList(x);
+            const filteredUniversities = x.filter(({ checkURL }) => checkURL !== null)
+            console.log(filteredUniversities);
+
+            setUniversityList(filteredUniversities);
         });
     }, []);
 
@@ -41,21 +80,25 @@ function SignUpScreen({ navigation }) {
     const handleSignUP = async (signUpFormData) => {
 
         try {
-            const session = await auth.createAccount({ name: signUpFormData.signup_name, email: signUpFormData.signup_email, password: signUpFormData.signup_password });
+            const checkedStudent = await checkStudent(signUpFormData.signup_email, signUpFormData.signup_mobile, signUpFormData.signup_universityName);
+
+            if (!checkedStudent) return;
+
+            const session = await auth.createAccount({ name: checkedStudent.name, email: signUpFormData.signup_email, password: signUpFormData.signup_password });
 
             if (session) {
                 setIsLoading(true);
                 // console.log('account created!');
                 try {
                     // creating student record in the database
-                    const student = await dbService.createStudent({ name: signUpFormData.signup_name, email: signUpFormData.signup_email, university: signUpFormData.signup_universityName });
+                    const student = await dbService.createStudent({ name: checkedStudent.name, email: signUpFormData.signup_email, university: signUpFormData.signup_universityName, roll: checkedStudent.enrolment, contact: checkedStudent.contact });
                     if (student) {
                         console.log('Sign-up screen --> session:', session);
                         const creespondingId = universityList.find(uni => uni.name === signUpFormData.signup_universityName).id;
                         await auth.addUserPrefInfo(signUpFormData.signup_universityName, creespondingId, student.$id);
 
                         reset({
-                            'signup_name': '',
+                            'signup_mobile': '',
                             'signup_email': '',
                             'signup_password': '',
                             'signup_retypePassword': '',
@@ -102,10 +145,10 @@ function SignUpScreen({ navigation }) {
                         />
 
                         <InputBox
-                            name='signup_name'
-                            label='Name'
-                            placeholder='Enter your name'
-                            icon='account-outline'
+                            name='signup_mobile'
+                            label='Mobile'
+                            placeholder='+91 1234567890'
+                            icon='cellphone'
                             control={control}
                             formErrors={errors}
                         />

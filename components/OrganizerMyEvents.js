@@ -7,19 +7,42 @@ import EventCard from './EventCard';
 import { UTC2date, UTC2time } from '../utils/dateTimeFormat';
 import { useNavigation } from '@react-navigation/native';
 import useAppwrite from '../context/appwriteAuthContext';
+import conf from '../conf/conf'
+import OrganizerEventCard from './OrganizerEventCard';
 
 function OrganizerMyEvents() {
-    const { user: { university_id,docID } } = useAppwrite();
+    const { auth, user: { university_id, docID } } = useAppwrite();
 
     const [myEvents, setMyEvents] = useState([]);
     const { navigate } = useNavigation();
 
-    useEffect(() => {
-        dbService.getEventsOfOrganizer(university_id,docID).then(res => {
+
+    const fetchEvents = () => {
+        dbService.getEventsOfOrganizer(university_id, docID).then(res => {
             console.log('my events:::::::>', res);
             setMyEvents(res);
+        }).catch(e => console.log(e));
+    }
+
+    useEffect(() => {
+        fetchEvents();
+        
+        const unsubscribe = auth.client.subscribe(`databases.${conf.db_id}.collections.${conf.event_collection_id}.documents`, response => {
+            // If new event created
+            if (response.events.includes("databases.*.collections.*.documents.*.create")) {
+                if (response.payload.organizer_name.$id === docID) {
+                    setMyEvents(prev => [response.payload, ...prev]);
+                }
+            }
         });
+
+        // Closes the subscription.
+        return () => {
+            unsubscribe();
+        }
     }, []);
+
+
 
     return (
         <>
@@ -41,8 +64,9 @@ function OrganizerMyEvents() {
                                     keyExtractor={(item, index) => item.$id}
                                     data={myEvents}
                                     renderItem={({ item }) => (
-                                        <EventCard
-                                            buttonLabel='View'
+                                        <OrganizerEventCard
+                                            stats={true}
+                                            buttonLabel='Reach'
                                             imageUrl={item.poster.toString()}
                                             title={item.event_name}
                                             date={UTC2date(item.event_starts)}

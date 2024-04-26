@@ -3,7 +3,7 @@ import { Button, Card, TextInput, Title } from 'react-native-paper'
 import { Text, View } from 'react-native'
 
 
-function EventCard({ title, organizer, price, description, date, time, imageUrl, onPress, buttonLabel }) {
+function EventCard({ stats = false, title, organizer, price, description, date, time, imageUrl, onPress, buttonLabel }) {
 
     return (
         <Card style={{ margin: 16 }} contentStyle={{ margin: 16 }}>
@@ -30,10 +30,17 @@ function EventCard({ title, organizer, price, description, date, time, imageUrl,
             </Card.Content>
 
             <Card.Actions>
-                <Button mode='contained' className='rounded-md' onPress={onPress} >{buttonLabel}</Button>
+                <Button
+                    icon={stats && 'chart-timeline-variant-shimmer'}
+                    mode='contained'
+                    className='rounded-md'
+                    onPress={onPress}
+                >
+                    {buttonLabel}
+                </Button>
             </Card.Actions>
 
-        </Card>
+        </Card >
 
     )
 }

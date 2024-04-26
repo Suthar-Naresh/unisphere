@@ -13,10 +13,10 @@ export class DBService {
         this.databases = new Databases(this.client);
     }
 
-    async createStudent({ name, email, university }) {
+    async createStudent({ name, email, university, roll, contact }) {
         try {
             return await this.databases.createDocument(conf.db_id, conf.student_collection_id, ID.unique(),
-                { name, email, university }
+                { name, email, university, roll, contact }
             );
         } catch (error) {
             throw new Error("DBService::createStudent()::error", error);
@@ -124,9 +124,10 @@ export class DBService {
         const current = new Date().toISOString();
 
         try {
-            return await this.databases.createDocument(conf.db_id, conf.announcements_collection_id, ID.unique(),
+            const res = await this.databases.createDocument(conf.db_id, conf.announcements_collection_id, ID.unique(),
                 { title, description, university_id: uniId, organizer: orgId, date: current }
             );
+            return res;
         } catch (error) {
             console.log("DBService::createAnnouncement()::error", error.type);
             console.log(error);
@@ -198,6 +199,7 @@ export class DBService {
                     Query.orderDesc("$createdAt")
                 ]
             );
+            console.log(list);
             return list.documents.filter(evnt => evnt.organizer_name.$id === docID);
         } catch (error) {
             console.log("DBService::getEventsOfOrganizer()::error", error.type);
