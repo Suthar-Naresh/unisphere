@@ -21,7 +21,12 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "permissions": [
+        "android.permission.RECORD_AUDIO",
+        "android.permission.CAMERA"
+      ],
+      "package": "com.sudo_dev.unisphere"
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -41,6 +46,11 @@
           "recordAudioAndroid": true
         }
       ]
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "5638bb44-0e67-4803-8440-5ea17e7fafcc"
+      }
+    }
   }
 }
