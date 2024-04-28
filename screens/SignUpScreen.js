@@ -20,15 +20,16 @@ import InputBox from '../components/InputBox';
 
 
 // Check function
-const checkStudent = async (email, contact, university) => {
+const checkStudent = async (email, contact, university, url) => {
     try {
+        // console.log('🔥🔥🔥🔥🔥',url);
         const postData = {
             "email": email,
             "contact": contact,
             "university": university
         }
 
-        const res = await fetch('http://192.168.38.51:3000/api/check', {
+        const res = await fetch(url || 'http://192.168.38.51:3000/api/check', {
             method: 'POST',
             headers: {
                 Accept: 'application/json',
@@ -38,6 +39,8 @@ const checkStudent = async (email, contact, university) => {
         });
 
         const data = await res.json();
+
+        console.log(data);
 
         if (data.status === 'ok') {
             return data.data;
@@ -80,7 +83,10 @@ function SignUpScreen({ navigation }) {
     const handleSignUP = async (signUpFormData) => {
 
         try {
-            const checkedStudent = await checkStudent(signUpFormData.signup_email, signUpFormData.signup_mobile, signUpFormData.signup_universityName);
+            const selectedUniversityURL = universityList.find(uni => uni.name === signUpFormData.signup_universityName).checkURL;
+            // const selectedUniversityURL = 'https://unisphere-nu.vercel.app/api/check';
+
+            const checkedStudent = await checkStudent(signUpFormData.signup_email, signUpFormData.signup_mobile, signUpFormData.signup_universityName, selectedUniversityURL);
 
             if (!checkedStudent) return;
 

@@ -92,7 +92,20 @@ function OthersTab({ navigation }) {
                                 keyExtractor={(item, index) => item.$id}
                                 data={externalEvente}
                                 renderItem={({ item }) => (
+                                    isOrganizer
+                                    ?
                                     <OrganizerEventCard
+                                        buttonLabel={isOrganizer ? 'Read More' : 'Book Now'}
+                                        imageUrl={item.poster.toString()}
+                                        title={item.event_name}
+                                        date={UTC2date(item.event_starts)}
+                                        organizer={item.organizer_name.university.name}
+                                        time={UTC2time(item.event_starts)}
+                                        price={item.price}
+                                        description={item.event_description}
+                                        onPress={() => navigation.navigate('event_screen', { cardDetails: item })} />
+                                    :
+                                    <EventCard
                                         buttonLabel={isOrganizer ? 'Read More' : 'Book Now'}
                                         imageUrl={item.poster.toString()}
                                         title={item.event_name}

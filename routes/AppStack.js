@@ -13,63 +13,12 @@ import BuySubscription from "../screens/BuySubscription";
 
 const Stack = createNativeStackNavigator();
 
-// Remove below all 👇
-import React from 'react'
-import { Text, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { Button } from "react-native-paper";
-
-function Demodemo() {
-    const fire = async () => {
-        try {
-            const postData = {
-                "email": "aasthapatel@pdpu.ac.in",
-                "contact": "9876345210",
-                "university": "Indus University"
-            }
-
-            const res = await fetch('http://192.168.38.51:3000/api/check', {
-                method: 'POST',
-                headers: {
-                  Accept: 'application/json',
-                  'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(postData),
-            });
-
-            console.log('🚀🚀🚀🚀🚀');
-
-            console.log(res);
-
-            const data = await res.json();
-
-            console.log(data);
-        } catch (error) {
-            console.log('💣💣', error);
-        }
-
-    }
-    return (
-        <SafeAreaView>
-            <View>
-                <Text>Test for website!!</Text>
-                <Text>Make fetch call to local website and collect the data!!!!!!</Text>
-            </View>
-            <Button onPress={fire} mode="contained-tonal">Fire 🔥</Button>
-        </SafeAreaView>
-    )
-}
-// Remove above all ☝️
-
-
 const AppStack = () => {
     const { user: { uniSubscribed, university } } = useAppwrite();
 
     if (!uniSubscribed) {
         return <BuySubscription university={university} />
     }
-
-
 
     return (
         <RegisteredEventsProvider>
@@ -78,7 +27,6 @@ const AppStack = () => {
                     headerShown: false
                 }}
             >
-                {/* <Stack.Screen name="main_screen" component={Demodemo} /> */}
                 <Stack.Screen name="main_screen" component={MainScreen} />
                 <Stack.Screen name="event_screen" component={EventScreen} />
                 <Stack.Screen name="add_event_screen" component={AddNewEventScreen} />

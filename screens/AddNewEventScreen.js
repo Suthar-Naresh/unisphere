@@ -165,7 +165,7 @@ function AddNewEventScreen() {
           text: 'Create',
           onPress: async () => {
             setFormSubmitting(true);
-            
+
             const res = await dbService.createNewEvent(posterURL, formData);
             if (res) {
               Toast.show({
@@ -228,9 +228,9 @@ function AddNewEventScreen() {
               placeholder={'Event starts'}
               label={'Event starts'}
               mode='outlined'
+              editable={false}
               value={dateTimeBeautify(eventStart)}
-              onFocus={() => { showMode('date', setShowEventStart, setModeEventStart) }}
-              left={<TextInput.Icon icon='calendar-clock' onPress={() => { }} />}
+              left={<TextInput.Icon icon='calendar-clock' onPress={() => showMode('date', setShowEventStart, setModeEventStart)} />}
               right={<TextInput.Icon icon='clock-outline' onPress={() => showMode('time', setShowEventStart, setModeEventStart)} />}
             />
 
@@ -245,9 +245,9 @@ function AddNewEventScreen() {
               placeholder={'Event ends'}
               label={'Event ends'}
               mode='outlined'
+              editable={false}
               value={dateTimeBeautify(eventEnd)}
-              onFocus={() => { showMode('date', setShowEventEnd, setModeEventEnd) }}
-              left={<TextInput.Icon icon='calendar-clock' onPress={() => { }} />}
+              left={<TextInput.Icon icon='calendar-clock' onPress={() => showMode('date', setShowEventEnd, setModeEventEnd)} />}
               right={<TextInput.Icon icon='clock-outline' onPress={() => showMode('time', setShowEventEnd, setModeEventEnd)} />}
             />
 
@@ -262,9 +262,9 @@ function AddNewEventScreen() {
               placeholder={'Registration starts'}
               label={'Registration starts'}
               mode='outlined'
+              editable={false}
               value={dateTimeBeautify(regBegin)}
-              onFocus={() => { showMode('date', setShowRegBegin, setModRegBegin) }}
-              left={<TextInput.Icon icon='calendar-clock' onPress={() => { }} />}
+              left={<TextInput.Icon icon='calendar-clock' onPress={() => showMode('date', setShowRegBegin, setModRegBegin)} />}
               right={<TextInput.Icon icon='clock-outline' onPress={() => showMode('time', setShowRegBegin, setModRegBegin)} />}
             />
 
@@ -279,9 +279,9 @@ function AddNewEventScreen() {
               placeholder={'Registration ends'}
               label={'Registration ends'}
               mode='outlined'
+              editable={false}
               value={dateTimeBeautify(regEnds)}
-              onFocus={() => { showMode('date', setShowRegEnds, setModeRegEnds) }}
-              left={<TextInput.Icon icon='calendar-clock' onPress={() => { }} />}
+              left={<TextInput.Icon icon='calendar-clock' onPress={() => showMode('date', setShowRegEnds, setModeRegEnds)} />}
               right={<TextInput.Icon icon='clock-outline' onPress={() => showMode('time', setShowRegEnds, setModeRegEnds)} />}
             />
 
